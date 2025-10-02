@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
     <title>Saved it</title>
 
-    <!-- PWA (frivilligt) -->
+    <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#0ea5e9" />
     <link rel="icon" href="icons/icon-192.png" />
@@ -15,6 +15,15 @@
 
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- BASE: auto-detektera repo-path (GitHub Pages) eller root (lokalt/egen domän) -->
+    <script>
+      (function computeBase(){
+        const parts = location.pathname.split('/').filter(Boolean);
+        // Om appen ligger på /<REPO>/... blir BASE="/<REPO>/", annars "/"
+        window.__BASE_PATH__ = parts.length ? `/${parts[0]}/` : '/';
+      })();
+    </script>
 
     <style>
       :root{
@@ -141,7 +150,7 @@
         <h4>Meny</h4>
         <button class="nav-btn" data-view="log"        type="button">Logg & översikt</button>
         <button class="nav-btn" data-view="goals"      type="button">Sparmål</button>
-        <button class="nav-btn" data-view="insights"   type="button">Insikter</button>
+        <button className="nav-btn" data-view="insights"   type="button">Insikter</button>
         <button class="nav-btn" data-view="history"    type="button">Historik</button>
         <button class="nav-btn" data-view="categories" type="button">Kategorier</button>
         <button class="nav-btn" data-view="settings"   type="button">Inställningar</button>
@@ -294,13 +303,13 @@
               />
               <input
                 ref={priceRef}
-                type="text"                /* iOS: undvik number-quirks */
+                type="text"
                 placeholder="Pris"
                 inputMode="decimal" pattern="[0-9]*[.,]?[0-9]*" autoComplete="off"
               />
               <button
                 className="btn btn-add" type="button"
-                onMouseDown={(e)=>e.preventDefault()}   /* behåll fokus => keyboard stannar */
+                onMouseDown={(e)=>e.preventDefault()}
                 onClick={addItem}
               >Lägg till</button>
             </div>
@@ -380,7 +389,7 @@
         );
 
 const GoalsView = () => {
-  const [depInputs, setDepInputs] = React.useState({}); // goalId -> string
+  const [depInputs, setDepInputs] = React.useState({});
   const setDep = (id, v) => setDepInputs(s => ({ ...s, [id]: v || "" }));
   const commitDep = (id) => { addDeposit(id, depInputs[id] || ""); setDep(id, ""); };
 
@@ -481,7 +490,7 @@ const GoalsView = () => {
               <button
                 className="btn"
                 type="button"
-                onMouseDown={e => e.preventDefault()}   // iOS: behåll keyboard fokus
+                onMouseDown={e => e.preventDefault()}
                 onClick={() => commitDep(goal.id)}
               >
                 Lägg till insättning
@@ -564,10 +573,12 @@ const GoalsView = () => {
         }
       });
 
-      // Service worker (frivilligt)
+      // Service worker (robust registrering med BASE)
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+          const BASE = window.__BASE_PATH__ || '/';
+          // Registrera alltid från rätt path (t.ex. /<REPO>/service-worker.js på Pages)
+          navigator.serviceWorker.register(`${BASE}service-worker.js`).catch(()=>{});
         });
       }
     </script>
