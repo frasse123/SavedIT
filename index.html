@@ -31,102 +31,101 @@
         --border:#e8eaf0; --ring:rgba(14,165,233,.18);
         --green:#22c55e; --red:#ef4444;
       }
-      :root { color-scheme: light; }
+      [data-theme="dark"]{
+        --bg:#0b1020; --surface:#0f1528; --text:#e5e7eb; --muted:#93a1b2;
+        --border:#1d2440; --ring:rgba(14,165,233,.22);
+      }
       html { -webkit-text-size-adjust: 100%; }
+      body{
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin:0; color:var(--text); background:var(--bg);
+      }
       *,*::before,*::after{ box-sizing:border-box; }
       html,body{ width:100%; max-width:100%; overflow-x:hidden; }
-      body{ font-family: Inter, system-ui,-apple-system, Segoe UI, Roboto, sans-serif; margin:0; color:var(--text); background:var(--bg); }
+      input,button,select,textarea{ width:100%; max-width:100%; min-width:0; }
 
-      /* HERO */
+      /* Header */
       .hero{
         background:
-          radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
+          radial-gradient(1200px 300px at 30% -10%, #bff0ec33 0%, transparent 60%),
           linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
-        padding: max(28px, calc(env(safe-area-inset-top) + 18px)) 0 22px;
-        border-bottom: 1px solid var(--border);
+        padding: max(24px, calc(env(safe-area-inset-top) + 14px)) 0 20px;
+        border-bottom:1px solid var(--border);
       }
-      .wrap{ max-width: 960px; margin: 0 auto; padding: 0 22px; }
+      [data-theme="dark"] .hero{
+        background:
+          radial-gradient(1200px 300px at 30% -10%, #0ea5a333 0%, transparent 60%),
+          linear-gradient(135deg, #0f1528 0%, #0c1326 40%, #0b1120 100%);
+      }
+      .wrap{ max-width: 960px; margin:0 auto; padding: 0 18px 22px; }
       .top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
       .brand{ display:flex; align-items:center; gap:12px; }
-      .logo{ width: 38px; height: 38px; border-radius: 12px; background: conic-gradient(from 200deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6); }
-      .brand h1{ font-size: 28px; line-height:1.1; margin:0; letter-spacing:-0.01em; }
-      .subtitle{ color:var(--muted); margin:6px 0 0 50px; }
+      .logo{ width:38px; height:38px; border-radius:12px;
+        background: conic-gradient(from 200deg, var(--accent), var(--accent-2));
+        box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.5);
+      }
+      h1{ margin:0; font-size:28px; letter-spacing:-.01em; }
+      .subtitle{ margin:6px 0 0 50px; color:var(--muted); }
+      .menu{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+      .menu .pill{
+        padding:8px 12px; border:1px solid var(--border); border-radius:999px;
+        background:#fff; color:#334155; font-weight:600; cursor:pointer;
+      }
+      [data-theme="dark"] .menu .pill{ background:var(--surface); color:#c9d2e0; }
+      .pill.active{
+        background:linear-gradient(135deg, var(--accent), var(--accent-2));
+        color:#fff; border-color:transparent;
+      }
+      .install{ padding:8px 12px; border-radius:999px; border:1px solid var(--border); background:#fff; }
+      .install[hidden]{ display:none; }
+      [data-theme="dark"] .install{ background:var(--surface); color:var(--text); }
 
-      .content{ max-width: 960px; margin: 0 auto; padding: 18px 22px 40px; }
+      /* Layout */
+      main{ max-width:960px; margin:0 auto; padding:22px 18px 28px; }
+      .row{ display:grid; grid-template-columns: 1fr 160px auto; gap:10px; margin:10px 0 18px; }
+      @media (max-width: 560px){ .row{ grid-template-columns:1fr; } }
 
-      /* Inputs och kort */
-      .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
-      @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
-      input[type="text"], input[type="number"]{
-        width:100%; max-width:100%; min-width:0;
-        padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
+      input[type="text"], input[type="number"], input[type="date"], select, textarea{
+        padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface);
         font-size:17px !important; color:var(--text); caret-color:var(--text);
-        outline:none; transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.03);
+        outline:none; transition:border-color .15s, box-shadow .15s; box-shadow:0 1px 0 rgba(15,23,42,.05);
       }
       input::placeholder{ color:#9aa0a6; opacity:1; }
-      input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
-      input:-webkit-autofill{ -webkit-text-fill-color: var(--text) !important; box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset; }
+      input:focus, select:focus, textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+      input:-webkit-autofill{
+        -webkit-text-fill-color:var(--text) !important;
+        box-shadow:0 0 0 1000px var(--surface) inset; -webkit-box-shadow:0 0 0 1000px var(--surface) inset;
+      }
 
-      .btn{ padding: 11px 14px; border-radius: 12px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer; font-weight:600; transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05); }
-      .btn:active{ transform: translateY(1px); }
-      .btn-add{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; box-shadow: 0 8px 20px rgba(15,118,110,.25); }
+      .btn{ padding:11px 14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-weight:600; }
+      .btn-add{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; box-shadow:0 8px 20px rgba(15,118,110,.25); }
+      .save{ background:#22c55e; color:#fff; border-color:#22c55e; }
+      .danger{ background:#ef4444; color:#fff; border-color:#ef4444; }
 
-      .card{ background: var(--surface); border:1px solid var(--border); border-radius: 16px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
-      .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-      .list-item:last-child{ border-bottom: 0; }
+      .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:0 2px 12px rgba(15,23,42,.06); }
+      .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border-bottom:1px solid var(--border); }
+      .list-item:last-child{ border-bottom:0; }
+      .muted{ color:var(--muted); }
 
-      .actions{ display:flex; gap: 8px; }
-      .save   { background: #22c55e; border-color:#22c55e; color:#fff; }
-      .danger { background: #ef4444; border-color:#ef4444; color:#fff; }
-
-      .section{ display:flex; align-items:center; justify-content:space-between; margin: 22px 0 12px; }
-      .section h3{ margin:0; font-size: 16px; letter-spacing: .02em; color:#111; }
-      .muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
-
-      .summary{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 16px; }
-      @media (max-width: 560px){ .summary{ grid-template-columns: 1fr; } }
-      .sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
-      .sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+      .section{ display:flex; align-items:center; justify-content:space-between; margin:22px 0 12px; }
+      .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+      .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      @media (max-width: 560px){ .grid3,.grid2{ grid-template-columns:1fr; } }
+      .sum-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px; }
+      .sum-label{ color:var(--muted); font-size:12px; letter-spacing:.04em; margin-bottom:6px; text-transform:uppercase; }
       .sum-value{ font-size:18px; font-weight:700; }
 
-      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
-      .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
+      .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
+      .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(14,165,233,.6)); border-radius:6px; min-width:6px; }
 
-      /* ========= HAMBURGER + DRAWER ========= */
-      .hamburger{
-        width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center;
-        border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer;
-        box-shadow:0 1px 0 rgba(15,23,42,.05);
-      }
-      .ham-lines{ position:relative; width:20px; height:2px; background:#334155; border-radius:2px; }
-      .ham-lines::before,.ham-lines::after{
-        content:""; position:absolute; left:0; width:20px; height:2px; background:#334155; border-radius:2px;
-      }
-      .ham-lines::before{ top:-6px; } .ham-lines::after{ top:6px; }
+      .table{ width:100%; border-collapse:collapse; }
+      .table th,.table td{ padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; font-size:14px; }
+      .table th{ color:var(--muted); font-weight:600; }
 
-      .drawer{
-        position: fixed; z-index: 60; inset:0 auto 0 0; width: 280px; max-width: 85vw;
-        background:#fff; border-right:1px solid var(--border);
-        transform: translateX(-100%); transition: transform .25s ease;
-        padding: calc(env(safe-area-inset-top) + 12px) 16px 16px;
-        display:flex; flex-direction:column; gap:6px;
-      }
-      .drawer.open{ transform: translateX(0); }
-      .drawer .menu-title{ font-weight:700; margin:6px 2px 10px; color:#0f172a; }
-      .nav-item{
-        width:100%; text-align:left; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
-        background:#fff; font-weight:600; color:#334155; cursor:pointer;
-      }
-      .nav-item.active{
-        background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent;
-      }
-      .overlay{
-        position: fixed; inset:0; background: rgba(0,0,0,.28); backdrop-filter: blur(1px);
-        z-index: 50; opacity:0; pointer-events:none; transition: opacity .2s ease;
-      }
-      .overlay.show{ opacity:1; pointer-events:auto; }
-      body.lock-scroll{ overflow:hidden; }
-      /* ====================================== */
+      .empty{ text-align:center; color:var(--muted); padding:18px 10px; }
+
+      .footer-note{ color:var(--muted); font-size:13px; line-height:1.5; }
+      .switch{ display:inline-flex; align-items:center; gap:8px; }
     </style>
   </head>
 
@@ -134,19 +133,22 @@
     <header class="hero">
       <div class="wrap">
         <div class="top">
-          <div class="brand">
-            <button id="hambtn" class="hamburger" aria-label="Meny" aria-controls="app-drawer" aria-expanded="false">
-              <span class="ham-lines" aria-hidden="true"></span>
-            </button>
-            <div class="logo" aria-hidden="true"></div>
-            <h1>Saved it</h1>
+          <div>
+            <div class="brand">
+              <div class="logo"></div>
+              <h1>Saved it</h1>
+            </div>
+            <p class="subtitle">Logga impulsköp du avstår. Spara pengar. Allt lagras lokalt på enheten.</p>
           </div>
-          <p class="subtitle">Logga impulsköp du avstår. Spara pengar. Allt lagras lokalt på enheten.</p>
+          <button id="installBtn" class="install btn" hidden>Installera appen</button>
         </div>
+
+        <!-- Huvudmeny-flikar -->
+        <nav class="menu" id="menu"></nav>
       </div>
     </header>
 
-    <main class="content">
+    <main>
       <div id="root"></div>
     </main>
 
@@ -158,73 +160,64 @@
     <script type="text/babel">
       const { useState, useEffect, useMemo } = React;
 
-      /* ====== Statiska vyer i menyn ====== */
-      const VIEWS = [
-        ["overview","Översikt"],
-        ["goals","Sparmål"],
-        ["insights","Insikter"],
-        ["history","Historik"],
-        ["categories","Kategorier"],
-        ["settings","Inställningar"],
-        ["about","Om"],
-        ["feedback","Feedback"],
-      ];
-
-      /* ====== Storage helpers ====== */
+      /* ----------------- Storage helpers ----------------- */
       const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
-      const saveLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-      /* ====== Datum-hjälp för översiktens period ====== */
-      const toDate = (iso) => new Date(iso);
-      const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
-      const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
-      const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
-      const isInRange = (date, start) => stripTime(date) >= stripTime(start);
+      /* ----------------- Date helpers ----------------- */
+      const toDate = iso => new Date(iso);
+      const stripTime = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const startOfWeek = d => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
+      const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1);
+      const startOfYear  = d => new Date(d.getFullYear(), 0, 1);
+      const fmt = (n, cur=' kr') => (Number(n)||0).toFixed(2) + cur;
 
-      /* ====== Drawer-komponent ====== */
-      function Drawer({open, view, onSelect, onClose}){
-        useEffect(() => {
-          const onEsc = (e)=>{ if(e.key === "Escape") onClose(); };
-          if(open) document.addEventListener("keydown", onEsc);
-          return ()=> document.removeEventListener("keydown", onEsc);
-        }, [open, onClose]);
+      /* ----------------- CSV export ----------------- */
+      const toCSV = rows => {
+        const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+        const head = Object.keys(rows[0]||{Namn:1,Pris:2,Datum:3}).join(',');
+        const body = rows.map(r => Object.values(r).map(esc).join(',')).join('\n');
+        return head + '\n' + body;
+      };
 
-        useEffect(() => {
-          document.body.classList.toggle("lock-scroll", open);
-          const btn = document.getElementById("hambtn");
-          if(btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
-        }, [open]);
+      /* ----------------- App ----------------- */
+      function App(){
+        // data
+        const [items, setItems] = useState(() => load("items", []));           // {id, name, price}
+        const [saved, setSaved] = useState(() => load("saved", []));           // {sid, name, price, date}
+        const [goals, setGoals] = useState(() => load("goals", []));           // med koppling: targets: ["Kaffe","Nocco"]
+        const [categories, setCategories] = useState(() => load("categories", {})); // { itemName: "Dryck" }
 
-        return (
-          <>
-            <div id="app-drawer" className={"drawer"+(open?" open":"")} role="dialog" aria-modal="true" aria-label="Meny">
-              <div className="menu-title">Meny</div>
-              {VIEWS.map(([key,label])=>(
-                <button
-                  key={key}
-                  className={"nav-item"+(view===key?" active":"")}
-                  onClick={()=>{ onSelect(key); onClose(); }}
-                  type="button"
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className={"overlay"+(open?" show":"")} onClick={onClose} />
-          </>
-        );
-      }
+        // settings
+        const [currency, setCurrency] = useState(() => load("currency"," kr"));
+        const [theme, setTheme] = useState(() => load("theme","light"));
+        useEffect(()=>{ document.body.setAttribute('data-theme', theme==='dark'?'dark':''); save("theme",theme);},[theme]);
+        useEffect(()=> save("currency",currency),[currency]);
 
-      /* ====== Översiktens komponent (din befintliga logik) ====== */
-      function Overview({items, saved, setItems, setSaved}){
+        // persist
+        useEffect(()=>save("items",items),[items]);
+        useEffect(()=>save("saved",saved),[saved]);
+        useEffect(()=>save("goals",goals),[goals]);
+        useEffect(()=>save("categories",categories),[categories]);
+
+        // overview input (kvar för kompatibilitet – visas i Översikt)
         const [newName, setNewName] = useState("");
         const [newPrice, setNewPrice] = useState("");
-        const [tab, setTab] = useState("week"); // week | month | year | all
 
-        useEffect(()=>saveLS("items", items), [items]);
-        useEffect(()=>saveLS("saved", saved), [saved]);
+        // flikar
+        const TABS = [
+          {key:"overview",   label:"Översikt"},
+          {key:"goals",      label:"Sparmål"},
+          {key:"insights",   label:"Insikter"},
+          {key:"history",    label:"Historik"},
+          {key:"categories", label:"Kategorier"},
+          {key:"settings",   label:"Inställningar"},
+          {key:"about",      label:"Om"},
+          {key:"feedback",   label:"Feedback"},
+        ];
+        const [tab, setTab] = useState("overview");
 
+        /* ---------- Översikt (som tidigare) ---------- */
         const addItem = () => {
           if(!newName.trim() || !newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
           const price = Number(newPrice.replace(",", "."));
@@ -232,166 +225,456 @@
           setItems(prev => [...prev, { id:String(Date.now()), name:newName.trim(), price }]);
           setNewName(""); setNewPrice("");
         };
-        const removeItem = (id) => setItems(prev => prev.filter(i=>i.id!==id));
-        const saveMoney  = (item) => setSaved(prev => [{...item, sid:String(Date.now()), date:new Date().toISOString()}, ...prev]);
-        const deleteSaved= (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
-        const clearHistory = () => { if(confirm("Rensa hela historiken?")) setSaved([]); };
+        const removeItem = id => setItems(prev => prev.filter(i => i.id!==id));
+        const saveMoney = item => {
+          const entry = { sid:String(Date.now()), name:item.name, price:item.price, date:new Date().toISOString() };
+          setSaved(prev => [entry, ...prev]);
+          // auto-koppla mot sparmål (om målet lyssnar på denna vara)
+          setGoals(prev => prev.map(g => {
+            if((g.targets||[]).includes(item.name)){
+              const newSaved = (g.saved||0) + (Number(item.price)||0);
+              return {...g, saved:newSaved};
+            }
+            return g;
+          }));
+        };
+        const deleteSaved = sid => setSaved(prev => prev.filter(s => s.sid!==sid));
 
-        const today = new Date();
-        const periodStart = useMemo(() => {
-          if(tab==="week")  return startOfWeek(today);
-          if(tab==="month") return startOfMonth(today);
-          if(tab==="year")  return startOfYear(today);
-          return new Date(0);
-        }, [tab]);
+        // summeringar för översikt (enkel)
+        const weekStart = startOfWeek(new Date());
+        const monthStart = startOfMonth(new Date());
+        const yearStart  = startOfYear(new Date());
+        const totalAll = useMemo(()=> saved.reduce((a,s)=>a+(+s.price||0),0), [saved]);
+        const totalFrom = d => saved.filter(s=>stripTime(toDate(s.date))>=stripTime(d))
+                                    .reduce((a,s)=>a+(+s.price||0),0);
 
-        const filtered = useMemo(() => saved.filter(s => isInRange(toDate(s.date), periodStart)), [saved, periodStart]);
-        const totalSavedAll    = useMemo(()=> saved.reduce((a,s)=>a+(+s.price||0),0), [saved]);
-        const totalSavedPeriod = useMemo(()=> filtered.reduce((a,s)=>a+(+s.price||0),0), [filtered]);
+        /* ---------- Sparmål ---------- */
+        const [goalName, setGoalName] = useState("");
+        const [goalTarget, setGoalTarget] = useState("");
+        const [goalTargets, setGoalTargets] = useState([]); // valda varor för koppling
 
-        const tabLabel = {week:"Vecka", month:"Månad", year:"År", all:"Alla"}[tab];
+        const createGoal = () => {
+          const t = Number(goalTarget.replace(",", "."));
+          if(!goalName.trim() || !t || t<=0){ alert("Namn och målbelopp behövs"); return; }
+          setGoals(prev => [...prev, { id:String(Date.now()), name:goalName.trim(), target:t, saved:0, targets:[...goalTargets] }]);
+          setGoalName(""); setGoalTarget(""); setGoalTargets([]);
+        };
+        const addManualToGoal = (goalId, amountStr) => {
+          const a = Number(amountStr.replace(",", "."));
+          if(!a || a<=0) return;
+          setGoals(prev => prev.map(g => g.id===goalId ? {...g, saved:(g.saved||0)+a} : g));
+        };
+        const removeGoal = id => setGoals(prev => prev.filter(g => g.id!==id));
 
-        return (
+        /* ---------- Insikter ---------- */
+        const groupByName = useMemo(()=>{
+          const map = new Map();
+          for(const s of saved){
+            const key = s.name;
+            map.set(key, (map.get(key)||0) + (+s.price||0));
+          }
+          return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
+        },[saved]);
+
+        const byWeekday = useMemo(()=>{
+          const map = Array(7).fill(0); // 0=Sun..6=Sat
+          saved.forEach(s => { const d=new Date(s.date).getDay(); map[d]+= (+s.price||0); });
+          return map; // visa Mån..Sön i UI
+        },[saved]);
+
+        const trendBars = useMemo(()=>{
+          // enkel trend: summa per dag senaste 14 dagarna
+          const today = stripTime(new Date());
+          const days = [];
+          for(let i=13;i>=0;i--){
+            const dd = new Date(today); dd.setDate(dd.getDate()-i);
+            days.push(dd.toISOString());
+          }
+          const sums = days.map(diso=>{
+            const d = new Date(diso);
+            return saved.filter(s => stripTime(toDate(s.date)).getTime()===d.getTime())
+                        .reduce((a,s)=>a+(+s.price||0),0);
+          });
+          const max = Math.max(...sums,1);
+          return sums.map(v => Math.max(6, Math.round(60*v/max)));
+        },[saved]);
+
+        /* ---------- Historik ---------- */
+        const [q, setQ] = useState("");
+        const [from, setFrom] = useState("");
+        const [to, setTo] = useState("");
+        const filteredHistory = useMemo(()=>{
+          const f = s=>{
+            if(q && !s.name.toLowerCase().includes(q.toLowerCase())) return false;
+            const d = stripTime(new Date(s.date));
+            if(from && d < stripTime(new Date(from))) return false;
+            if(to && d > stripTime(new Date(to))) return false;
+            return true;
+          };
+          return saved.filter(f);
+        },[saved,q,from,to]);
+
+        const exportCSV = () => {
+          const rows = filteredHistory.map(s=>({Namn:s.name, Pris:(+s.price||0), Datum:new Date(s.date).toLocaleString()}));
+          const csv = toCSV(rows);
+          const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'saved-it.csv';
+          document.body.appendChild(a); a.click(); a.remove();
+          URL.revokeObjectURL(url);
+        };
+
+        /* ---------- Kategorier ---------- */
+        const setItemCategory = (name, cat) => {
+          setCategories(prev => ({...prev, [name]:cat}));
+        };
+        const categoryTotals = useMemo(()=>{
+          const map = new Map();
+          for(const s of saved){
+            const cat = categories[s.name] || "Okategoriserat";
+            map.set(cat, (map.get(cat)||0) + (+s.price||0));
+          }
+          return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
+        },[saved,categories]);
+
+        /* ---------- Inställningar ---------- */
+        const clearAll = () => {
+          if(!confirm("Rensa ALLA lokala data?")) return;
+          localStorage.clear(); location.reload();
+        };
+
+        /* ---------- UI helpers ---------- */
+        const Menu = () => (
           <>
-            {/* Inmatning */}
-            <div className="row">
-              <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
-              <input type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
-              <button className="btn btn-add" onClick={addItem}>Lägg till</button>
+            {TABS.map(t => (
+              <button
+                key={t.key}
+                className={"pill"+(tab===t.key?" active":"")}
+                onClick={()=>setTab(t.key)}
+              >{t.label}</button>
+            ))}
+          </>
+        );
+
+        /* ---------- Views ---------- */
+        const Overview = () => {
+          // vecka/månad/år – enkel summering
+          const [range, setRange] = useState("week"); // week|month|year|all
+          const start = range==="week" ? weekStart : range==="month" ? monthStart : range==="year" ? yearStart : new Date(0);
+          const period = saved.filter(s=>stripTime(toDate(s.date))>=stripTime(start));
+          const totalPeriod = period.reduce((a,s)=>a+(+s.price||0),0);
+
+          // mini bars för period
+          const bars = useMemo(()=>{
+            const map = new Map();
+            period.forEach(s=>{
+              const k = stripTime(new Date(s.date)).toISOString();
+              map.set(k,(map.get(k)||0)+(+s.price||0));
+            });
+            const arr = Array.from(map.values());
+            const max = Math.max(...arr,1);
+            return arr.map(v=>Math.max(6, Math.round(60*v/max)));
+          },[period]);
+
+          return (
+            <>
+              {/* Inputrad */}
+              <div className="row">
+                <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
+                <input type="number" step="0.01" placeholder={"Pris"+currency} value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
+                <button className="btn btn-add" onClick={addItem}>Lägg till</button>
+              </div>
+
+              {/* Lista med items */}
+              {items.length===0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
+              {items.length>0 && (
+                <div className="card">
+                  {items.map(it=>(
+                    <div className="list-item" key={it.id}>
+                      <div><strong>{it.name}</strong> <span className="muted">({fmt(it.price, currency)})</span></div>
+                      <div style={{display:'flex', gap:8}}>
+                        <button className="btn save" onClick={()=>saveMoney(it)}>Avstod</button>
+                        <button className="btn danger" onClick={()=>removeItem(it.id)}>Ta bort</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Översikt */}
+              <div className="section"><h3>Översikt</h3></div>
+              <div className="menu" style={{margin:'8px 0 10px'}}>
+                {["week","month","year","all"].map(k=>(
+                  <button key={k} className={"pill"+(range===k?" active":"")} onClick={()=>setRange(k)}>
+                    {{week:"Vecka",month:"Månad",year:"År",all:"Alla"}[k]}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid3">
+                <div className="sum-card">
+                  <div className="sum-label">Totalt sparat – period</div>
+                  <div className="sum-value">{fmt(totalPeriod,currency)}</div>
+                </div>
+                <div className="sum-card">
+                  <div className="sum-label">Antal avståenden</div>
+                  <div className="sum-value">{period.length}</div>
+                </div>
+                <div className="sum-card">
+                  <div className="sum-label">Totalt (alla tider)</div>
+                  <div className="sum-value">{fmt(totalAll,currency)}</div>
+                </div>
+              </div>
+
+              {bars.length>0 && (
+                <div className="card" style={{padding:'6px 8px', marginTop:10}}>
+                  <div style={{padding:'6px 10px', fontWeight:600, color:'#334155'}}>Logg – {({week:"vecka",month:"månad",year:"år",all:"alla"})[range]}</div>
+                  <div className="bars">{bars.map((h,i)=><div key={i} className="bar" style={{height:h}}/>)}</div>
+                </div>
+              )}
+            </>
+          );
+        };
+
+        const Goals = () => (
+          <>
+            <div className="section"><h3>Sparmål</h3></div>
+            <div className="grid3">
+              <input type="text" placeholder="Namn på mål (t.ex. Nödfond)" value={goalName} onChange={e=>setGoalName(e.target.value)} />
+              <input type="number" step="0.01" placeholder={"Målbelopp ("+currency.trim()+")"} value={goalTarget} onChange={e=>setGoalTarget(e.target.value)} />
+              <button className="btn btn-add" onClick={createGoal}>Skapa mål</button>
+            </div>
+            <div className="muted" style={{margin:'6px 0 12px'}}>Koppla varor till målet genom att välja nedan (autoinsättning när du “Avstod”).</div>
+
+            {/* välj kopplade varor */}
+            <div className="card" style={{padding:'10px 14px', marginBottom:12}}>
+              <div style={{fontWeight:600, marginBottom:8}}>Koppla varor till nytt mål</div>
+              <div className="menu">
+                {items.map(it=>{
+                  const active = goalTargets.includes(it.name);
+                  return (
+                    <button
+                      key={it.id}
+                      className={"pill"+(active?" active":"")}
+                      onClick={()=>{
+                        setGoalTargets(prev => active ? prev.filter(n=>n!==it.name) : [...prev,it.name]);
+                      }}
+                    >{it.name}</button>
+                  );
+                })}
+                {items.length===0 && <span className="muted">Lägg till varor i Översikt först.</span>}
+              </div>
             </div>
 
-            {/* Möjliga impulsköp */}
-            {items.length === 0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
-            {items.length > 0 && (
-              <div className="card" style={{marginBottom:12}}>
-                {items.map(item=>(
-                  <div className="list-item" key={item.id}>
-                    <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
-                    <div className="actions">
-                      <button className="btn save" onClick={()=>saveMoney(item)}>Avstod</button>
-                      <button className="btn danger" onClick={()=>removeItem(item.id)}>Ta bort</button>
-                    </div>
+            {goals.length===0 && <div className="empty">Inga sparmål ännu.</div>}
+            {goals.map(g=>{
+              const pct = Math.min(100, Math.round(((g.saved||0)/(g.target||1))*100));
+              let manual = "";
+              return (
+                <div className="card" style={{padding:'14px', marginBottom:14}} key={g.id}>
+                  <div className="section">
+                    <div style={{fontWeight:700}}>{g.name}</div>
+                    <button className="btn danger" onClick={()=>removeGoal(g.id)}>Ta bort</button>
+                  </div>
+                  <div className="muted">Mål: {fmt(g.target,currency)} · Sparat: {fmt(g.saved||0,currency)} ({pct}%)</div>
+                  <div style="height:8px;border-radius:999px;background:var(--border);margin:10px 0;">
+                    <div style={`height:8px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent-2));width:${pct}%`}></div>
+                  </div>
+                  {g.targets?.length>0 && <div className="muted" style={{marginBottom:8}}>Kopplade varor: {g.targets.join(", ")}</div>}
+                  <div className="grid2">
+                    <input type="number" step="0.01" placeholder={"Insättning ("+currency.trim()+")"} onChange={e=>{ manual=e.target.value; }} />
+                    <button className="btn" onClick={()=>addManualToGoal(g.id, manual)}>Lägg till insättning</button>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        );
+
+        const Insights = () => (
+          <>
+            <div className="section"><h3>Insikter</h3></div>
+
+            <div className="grid3">
+              <div className="sum-card">
+                <div className="sum-label">Topp-varor</div>
+                {groupByName.length===0 && <div className="muted">—</div>}
+                {groupByName.slice(0,5).map(([name,sum])=>(
+                  <div key={name} style={{display:'flex', justifyContent:'space-between', padding:'6px 0'}}>
+                    <span>{name}</span><b>{fmt(sum,currency)}</b>
                   </div>
                 ))}
               </div>
-            )}
 
-            {/* Period-kort */}
-            <div className="section"><h3>Översikt</h3></div>
-            <div style={{display:"flex", gap:8, flexWrap:"wrap", margin:"8px 0 10px"}}>
-              {["week","month","year","all"].map(key=>(
-                <button
-                  key={key}
-                  className={"btn"+(tab===key?" btn-add":"")}
-                  onClick={()=>setTab(key)}
-                  type="button"
-                >
-                  {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
-                </button>
+              <div className="sum-card">
+                <div className="sum-label">Per veckodag</div>
+                {(() => {
+                  const labels = ["Sön","Mån","Tis","Ons","Tors","Fre","Lör"];
+                  return labels.map((l,i)=>(
+                    <div key={i} style={{display:'flex', justifyContent:'space-between', padding:'6px 0'}}>
+                      <span>{l}</span><b>{fmt(byWeekday[i]||0,currency)}</b>
+                    </div>
+                  ));
+                })()}
+              </div>
+
+              <div className="sum-card">
+                <div className="sum-label">Trend (14 dagar)</div>
+                <div className="bars" style="height:70px">{trendBars.map((h,i)=><div key={i} className="bar" style={{height:h}}/>)}</div>
+              </div>
+            </div>
+          </>
+        );
+
+        const History = () => (
+          <>
+            <div className="section"><h3>Historik</h3><button className="btn" onClick={exportCSV}>Exportera CSV</button></div>
+            <div className="grid3" style={{margin:'10px 0 12px'}}>
+              <input type="text" placeholder="Sök (t.ex. kaffe)" value={q} onChange={e=>setQ(e.target.value)} />
+              <input type="date" value={from} onChange={e=>setFrom(e.target.value)} />
+              <input type="date" value={to} onChange={e=>setTo(e.target.value)} />
+            </div>
+
+            <div className="card" style={{overflowX:'auto'}}>
+              <table className="table">
+                <thead><tr><th>Namn</th><th>Pris</th><th>Datum</th><th></th></tr></thead>
+                <tbody>
+                  {filteredHistory.length===0 && <tr><td colSpan="4" className="empty">Inget att visa</td></tr>}
+                  {filteredHistory.map(s=>(
+                    <tr key={s.sid}>
+                      <td>{s.name}</td>
+                      <td>{fmt(s.price,currency)}</td>
+                      <td>{new Date(s.date).toLocaleString()}</td>
+                      <td><button className="btn danger" onClick={()=>deleteSaved(s.sid)}>Ta bort</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        );
+
+        const Categories = () => (
+          <>
+            <div className="section"><h3>Kategorier</h3></div>
+
+            <div className="card" style={{padding:'10px 14px', marginBottom:12}}>
+              {items.length===0 && <div className="empty">Lägg till varor i Översikt först.</div>}
+              {items.map(it=>(
+                <div className="list-item" key={it.id}>
+                  <div><strong>{it.name}</strong> <span className="muted">({fmt(it.price,currency)})</span></div>
+                  <div style={{maxWidth:220}}>
+                    <input type="text" placeholder="Kategori (t.ex. Dryck)" value={categories[it.name]||""} onChange={e=>setItemCategory(it.name, e.target.value)} />
+                  </div>
+                </div>
               ))}
             </div>
 
-            <div className="summary">
-              <div className="sum-card">
-                <div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div>
-                <div className="sum-value">{totalSavedPeriod.toFixed(2)} kr</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Antal avståenden</div>
-                <div className="sum-value">{filtered.length}</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Totalt (alla tider)</div>
-                <div className="sum-value">{totalSavedAll.toFixed(2)} kr</div>
-              </div>
+            <div className="section"><h3>Summering per kategori</h3></div>
+            <div className="card" style={{padding:'10px 14px'}}>
+              {categoryTotals.length===0 && <div className="empty">—</div>}
+              {categoryTotals.map(([cat,sum])=>(
+                <div key={cat} style={{display:'flex', justifyContent:'space-between', padding:'6px 0'}}>
+                  <span>{cat}</span><b>{fmt(sum,currency)}</b>
+                </div>
+              ))}
             </div>
-
-            {/* Historik */}
-            <div className="section">
-              <h3>Historik – {tabLabel.toLowerCase()}</h3>
-              {saved.length>0 && <button className="btn danger" onClick={clearHistory}>Rensa all historik</button>}
-            </div>
-
-            {filtered.length===0 && <div className="empty">Du har inte avstått något i vald period.</div>}
-            {filtered.length>0 && (
-              <div className="card">
-                {filtered.slice(0,100).map(s=>(
-                  <div className="list-item" key={s.sid}>
-                    <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
-                    <div className="actions">
-                      <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
-                      <button className="btn danger" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="stats"><b>Totalt sparat: {totalSavedAll.toFixed(2)} kr</b></div>
           </>
         );
-      }
 
-      /* ====== Huvudapp med drawer ====== */
-      function App(){
-        const [view, setView] = useState("overview");
-        const [drawerOpen, setDrawerOpen] = useState(false);
+        const Settings = () => (
+          <>
+            <div className="section"><h3>Inställningar</h3></div>
+            <div className="grid3">
+              <div className="sum-card">
+                <div className="sum-label">Valuta</div>
+                <input type="text" value={currency} onChange={e=>setCurrency(e.target.value)} />
+                <div className="footer-note" style="margin-top:8px">Exempel: <code> kr</code>, <code> SEK</code>, <code> €</code></div>
+              </div>
 
-        // Data som översikten använder
-        const [items, setItems] = useState(()=>load("items", []));
-        const [saved, setSaved] = useState(()=>load("saved", []));
+              <div className="sum-card">
+                <div className="sum-label">Tema</div>
+                <div className="switch">
+                  <input id="themeDark" type="checkbox" checked={theme==='dark'} onChange={e=>setTheme(e.target.checked?'dark':'light')} />
+                  <label for="themeDark">Mörkt läge</label>
+                </div>
+              </div>
 
-        // Öppna/lukta via knapp i headern (utanför React)
+              <div className="sum-card">
+                <div className="sum-label">Data</div>
+                <button className="btn danger" onClick={clearAll}>Rensa allt</button>
+              </div>
+            </div>
+          </>
+        );
+
+        const About = () => (
+          <>
+            <div className="section"><h3>Om</h3></div>
+            <div className="card" style={{padding:'14px'}}>
+              <p><b>Saved it</b> hjälper dig att logga impulsköp du avstår och se hur mycket pengar du sparar över tid.</p>
+              <p className="footer-note">
+                • All data lagras lokalt på din enhet. <br/>
+                • Lägg till på hemskärmen för app-känsla (PWA). <br/>
+                • Om ikonen inte uppdateras direkt – rensa sajtens cache i webbläsaren.
+              </p>
+              <p className="footer-note">Version: 1.0</p>
+            </div>
+          </>
+        );
+
+        const Feedback = () => (
+          <>
+            <div className="section"><h3>Feedback</h3></div>
+            <div className="grid2">
+              <a className="btn" href="mailto:dinmail@exempel.se?subject=Saved%20it%20feedback">Skicka e-post</a>
+              <a className="btn" href="#" onclick="alert('Lägg valfri länk till GitHub/Issues här.'); return false;">Öppna GitHub</a>
+            </div>
+          </>
+        );
+
+        /* ---------- Render ---------- */
         useEffect(()=>{
-          const btn = document.getElementById("hambtn");
-          if(!btn) return;
-          const onClick = ()=> setDrawerOpen(true);
-          btn.addEventListener("click", onClick);
-          return ()=> btn.removeEventListener("click", onClick);
-        },[]);
-
-        // Enkel view-router
-        const renderView = () => {
-          switch(view){
-            case "overview":
-              return <Overview items={items} saved={saved} setItems={setItems} setSaved={setSaved} />;
-            case "goals":
-              return <div className="card" style={{padding:18}}><h3>Sparmål</h3><p className="muted">Lägg till dina mål här…</p></div>;
-            case "insights":
-              return <div className="card" style={{padding:18}}><h3>Insikter</h3><p className="muted">Diagram och trender kommer här…</p></div>;
-            case "history":
-              return <div className="card" style={{padding:18}}><h3>Historik</h3><p className="muted">Full historiklista…</p></div>;
-            case "categories":
-              return <div className="card" style={{padding:18}}><h3>Kategorier</h3><p className="muted">Hantera kategorier för dina impulsköp…</p></div>;
-            case "settings":
-              return <div className="card" style={{padding:18}}><h3>Inställningar</h3><p className="muted">Val för valuta, språk, export m.m.…</p></div>;
-            case "about":
-              return <div className="card" style={{padding:18}}><h3>Om</h3><p className="muted">Saved it – en enkel PWA för att spara pengar.</p></div>;
-            case "feedback":
-              return <div className="card" style={{padding:18}}><h3>Feedback</h3><p className="muted">Har du förslag? Skriv ner dem här!</p></div>;
-            default:
-              return null;
-          }
-        };
+          const el = document.getElementById('menu');
+          if(el){ ReactDOM.createRoot(el).render(<Menu/>); }
+        },[tab, items, saved, goals, categories, currency, theme]);
 
         return (
           <>
-            <Drawer
-              open={drawerOpen}
-              view={view}
-              onSelect={setView}
-              onClose={()=>setDrawerOpen(false)}
-            />
-            {renderView()}
+            {tab==="overview"   && <Overview/>}
+            {tab==="goals"      && <Goals/>}
+            {tab==="insights"   && <Insights/>}
+            {tab==="history"    && <History/>}
+            {tab==="categories" && <Categories/>}
+            {tab==="settings"   && <Settings/>}
+            {tab==="about"      && <About/>}
+            {tab==="feedback"   && <Feedback/>}
           </>
         );
       }
 
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 
-      // Service worker (PWA)
-      if('serviceWorker' in navigator){
+      /* -------- PWA install prompt -------- */
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('installBtn');
+        if(!btn) return;
+        btn.hidden = false;
+        btn.onclick = async () => {
+          btn.disabled = true;
+          await deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          btn.hidden = true;
+          deferredPrompt = null;
+        };
+      });
+
+      /* -------- Service Worker -------- */
+      if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./service-worker.js');
         });
