@@ -2,16 +2,17 @@
 <html lang="sv">
   <head>
     <meta charset="utf-8" />
-    <!-- Viktigt på iOS: viewport-fit och låsa zoom för att undvika auto-zoom i inputs -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    />
     <title>Saved it</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#0ea5e9" />
     <link rel="icon" href="icons/icon-192.png" />
-    <!-- iOS-ikon (lägg filen i roten) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=11" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=12" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
@@ -19,114 +20,92 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-/* ========== BASE / RESET ========== */
-:root {
-  --accent:#0f766e; --accent-2:#0ea5a3;
-  --bg:#f6f8fb; --surface:#ffffff;
-  --text:#0f172a; --muted:#6b7280;
-  --border:#e8eaf0; --ring:rgba(14,165,233,.18);
-  --green:#22c55e; --red:#ef4444;
-  color-scheme: light;            /* slå fast ljust läge */
-}
-html { -webkit-text-size-adjust:100%; }
-*, *::before, *::after { box-sizing:border-box; }
-html, body { width:100%; max-width:100%; overflow-x:hidden; margin:0; }
-body {
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color:var(--text); background:var(--bg);
-}
+      :root{
+        --accent:#0f766e; --accent-2:#0ea5a3;
+        --bg:#f6f8fb; --surface:#ffffff;
+        --text:#0f172a; --muted:#6b7280;
+        --border:#e8eaf0; --ring:rgba(14,165,233,.18);
+        --green:#22c55e; --red:#ef4444;
+      }
+      :root { color-scheme: light; }
+      html { -webkit-text-size-adjust: 100%; }
+      *,*::before,*::after{ box-sizing:border-box; }
+      html,body{ width:100%; max-width:100%; overflow-x:hidden; }
+      body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; color:var(--text); background:var(--bg); }
 
-/* ========== HERO ========== */
-.hero{
-  background:
-    radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
-    linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
-  padding:max(28px, calc(env(safe-area-inset-top) + 18px)) 0 28px;
-  border-bottom:1px solid var(--border);
-}
-.wrap{ max-width:860px; margin:0 auto; padding:0 22px 28px; }
-.top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.brand{ display:flex; align-items:center; gap:12px; }
-.logo{
-  width:38px; height:38px; border-radius:12px;
-  background:conic-gradient(from 200deg, var(--accent), var(--accent-2));
-  box-shadow:0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);
-}
-.brand h1{ font-size:30px; line-height:1.1; margin:0; letter-spacing:-.01em; }
-.subtitle{ color:var(--muted); margin:6px 0 0 50px; }
-.install{
-  padding:10px 14px; border-radius:999px; background:#fff;
-  border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06);
-}
-.install[hidden]{ display:none; }
-.content{ max-width:860px; margin:0 auto; padding:22px; }
+      /* HERO */
+      .hero{
+        background: radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
+                    linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
+        padding: max(28px, calc(env(safe-area-inset-top) + 18px)) 0 28px;
+        border-bottom: 1px solid var(--border);
+      }
+      .wrap{ max-width: 860px; margin: 0 auto; padding: 0 22px 28px; }
+      .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+      .brand{ display:flex; align-items:center; gap:12px; }
+      .logo{ width: 38px; height: 38px; border-radius: 12px; background: conic-gradient(from 200deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);}
+      .brand h1{ font-size: 30px; line-height:1.1; margin:0; letter-spacing:-0.01em; }
+      .subtitle{ color:var(--muted); margin:6px 0 0 50px; }
 
-/* ========== INPUTS ========== */
-.row{
-  display:grid;
-  grid-template-columns:1fr 160px auto;   /* namn | pris | knapp (desktop) */
-  gap:10px; margin:10px 0 18px;
-}
-@media (max-width:560px){ .row{ grid-template-columns:1fr; } }  /* stacka på mobil */
+      .install{ padding:10px 14px; border-radius: 999px; background:#fff; border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06); }
+      .install[hidden]{ display:none; }
 
-input[type="text"], input[type="number"]{
-  width:100%; padding:12px 14px;
-  border:1px solid var(--border); border-radius:12px; background:#fff;
-  font-size:17px; color:var(--text); caret-color:var(--text);
-  outline:none; transition:border-color .15s, box-shadow .15s;
-  box-shadow:0 1px 0 rgba(15,23,42,.03);
-}
-input::placeholder{ color:#9aa0a6; opacity:1; }
-input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
-input:-webkit-autofill{
-  -webkit-text-fill-color:var(--text) !important;
-  box-shadow:0 0 0 1000px #fff inset; -webkit-box-shadow:0 0 0 1000px #fff inset;
-}
+      .content{ max-width: 860px; margin: 0 auto; padding: 22px; }
 
-/* Buttons */
-.btn{
-  padding:11px 14px; border-radius:12px; border:1px solid var(--border);
-  background:#fff; color:var(--text); cursor:pointer; font-weight:600;
-  transition:transform .06s, box-shadow .15s; box-shadow:0 1px 0 rgba(15,23,42,.05);
-}
-.btn:active{ transform:translateY(1px); }
-.btn-add{
-  background:linear-gradient(135deg, var(--accent), var(--accent-2));
-  color:#fff; border-color:transparent; box-shadow:0 8px 20px rgba(15,118,110,.25);
-}
+      /* Inputs */
+      .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
+      @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
+      input[type="text"], input[type="number"]{
+        width:100%; max-width:100%; min-width:0;
+        padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
+        font-size:17px !important; color:var(--text); caret-color:var(--text);
+        outline:none; transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.03);
+      }
+      input::placeholder{ color:#9aa0a6; opacity:1; }
+      input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+      input:-webkit-autofill{ -webkit-text-fill-color: var(--text) !important; box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset; }
 
-/* Lists & cards */
-.card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:0 2px 12px rgba(15,23,42,.06); }
-.list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border-bottom:1px solid var(--border); }
-.list-item:last-child{ border-bottom:0; }
+      .btn{ padding: 11px 14px; border-radius: 12px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer; font-weight:600; transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05); }
+      .btn:active{ transform: translateY(1px); }
+      .btn-add{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; box-shadow: 0 8px 20px rgba(15,118,110,.25); }
 
-.actions{ display:flex; gap:8px; }
-.save{ background:#22c55e; border-color:#22c55e; color:#fff; }
-.danger{ background:#ef4444; border-color:#ef4444; color:#fff; }
+      .card{ background: var(--surface); border:1px solid var(--border); border-radius: 16px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
+      .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+      .list-item:last-child{ border-bottom: 0; }
 
-.section{ display:flex; align-items:center; justify-content:space-between; margin:22px 0 12px; }
-.section h3{ margin:0; font-size:16px; letter-spacing:.02em; color:#111; }
-.muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
+      .actions{ display:flex; gap: 8px; }
+      .save   { background: #22c55e; border-color:#22c55e; color:#fff; }
+      .danger { background: #ef4444; border-color:#ef4444; color:#fff; }
 
-/* Tabs */
-.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px; }
-.tab{ padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; font-weight:600; color:#334155; }
-.tab.active{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
+      .section{ display:flex; align-items:center; justify-content:space-between; margin: 22px 0 12px; }
+      .section h3{ margin:0; font-size: 16px; letter-spacing: .02em; color:#111; }
+      .muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
 
-/* Summary */
-.summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 16px; }
-@media (max-width:560px){ .summary{ grid-template-columns:1fr; } }
-.sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
-.sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
-.sum-value{ font-size:18px; font-weight:700; }
+      .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px; }
+      .tab{ padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; font-weight:600; color:#334155; }
+      .tab.active{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
 
-/* Mini-bars */
-.bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
-.bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
+      .summary{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 16px; }
+      @media (max-width: 560px){ .summary{ grid-template-columns: 1fr; } }
+      .sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
+      .sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+      .sum-value{ font-size:18px; font-weight:700; }
 
-/* Footer stats */
-.stats{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:0 -1px 10px rgba(15,23,42,.06); }
-.empty{ text-align:center; color:var(--muted); padding:18px 10px; }
+      .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
+      .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
+
+      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
+      .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
+
+      /* ====== NYTT: Utmaningskort ====== */
+      .challenge{ margin: 10px 0 16px; }
+      .challenge .header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; }
+      .challenge .title{ font-weight:700; }
+      .dots{ display:flex; gap:8px; padding: 0 16px 14px; }
+      .dot{ width:18px; height:18px; border-radius:50%; border:1px solid var(--border); background:#fff; }
+      .dot.ok{ background: var(--green); border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+      .streak{ padding: 0 16px 14px; color:#334155; font-size:14px; }
+      .badge{ margin-left:8px; padding:2px 8px; border-radius:999px; background:#fec84b; font-size:12px; font-weight:700; }
     </style>
   </head>
 
@@ -156,17 +135,47 @@ input:-webkit-autofill{
     <script type="text/babel">
       const { useState, useEffect, useMemo } = React;
 
-      // ------- Storage helpers -------
+      // Storage helpers
       const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
       const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-      // ------- Date utilities -------
+      // Date utilities
       const toDate = (iso) => new Date(iso);
       const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
       const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
       const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
       const isInRange = (date, start) => stripTime(date) >= stripTime(start);
+
+      /* ============ NYTT: latte-matchning + utmanings-helpers ============ */
+      const normalize = (s='') => s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase().trim();
+      const isLatte = (name='') => normalize(name).includes('latte');
+
+      // Bygg array för de senaste 7 dagarna (inkl. idag), med true/false om "latte avstod"
+      function computeSevenDaysLatte(saved, fromDate = stripTime(new Date())) {
+        const today = stripTime(new Date());
+        // 7 dagar bakåt från idag
+        const days = Array.from({length:7}, (_,i) => {
+          const d = new Date(today); d.setDate(today.getDate() - (6-i));
+          return { date: d, ok:false };
+        });
+        for (const s of saved) {
+          if (!isLatte(s.name)) continue;
+          const sd = stripTime(toDate(s.date)).getTime();
+          for (const d of days) {
+            if (sd === d.date.getTime() && sd >= stripTime(fromDate).getTime()) {
+              d.ok = true;
+            }
+          }
+        }
+        const allOk = days.every(d => d.ok);
+        // Streak (räkna från idag bakåt)
+        let streak = 0;
+        for (let i=days.length-1; i>=0; i--) {
+          if (days[i].ok) streak++; else break;
+        }
+        return { days, streak, complete: allOk };
+      }
 
       function App(){
         const [items, setItems]   = useState(() => load("items", []));
@@ -175,8 +184,14 @@ input:-webkit-autofill{
         const [newPrice, setNewPrice] = useState("");
         const [tab, setTab] = useState("week"); // week | month | year | all
 
+        // NYTT: utmanings-state
+        const [challenge, setChallenge] = useState(() =>
+          load("chalNoLatte", { active:false, start:null, best:0, completedAt:null })
+        );
+
         useEffect(() => save("items", items), [items]);
         useEffect(() => save("saved", saved), [saved]);
+        useEffect(() => save("chalNoLatte", challenge), [challenge]);
 
         const addItem = () => {
           if(!newName.trim() || !newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
@@ -199,24 +214,38 @@ input:-webkit-autofill{
           return new Date(0); // all
         }, [tab]);
 
-        const filtered = useMemo(() => saved.filter(s => isInRange(toDate(s.date), periodStart)), [saved, periodStart]);
+        const filtered = useMemo(() => {
+          return saved.filter(s => isInRange(toDate(s.date), periodStart));
+        }, [saved, periodStart]);
 
         // Summeringar
         const totalSavedAll   = useMemo(() => saved.reduce((a,s)=>a+(+s.price||0),0), [saved]);
         const totalSavedPeriod= useMemo(() => filtered.reduce((a,s)=>a+(+s.price||0),0), [filtered]);
 
-        // Grupp för mini-bars (per dag)
-        const bars = useMemo(() => {
-          const map = new Map();
-          for(const s of filtered){
-            const key = stripTime(toDate(s.date)).toISOString();
-            map.set(key, (map.get(key)||0) + (+s.price||0));
+        // NYTT: räkna utmaningen dynamiskt från sparad data
+        const chStart = challenge.start ? stripTime(new Date(challenge.start)) : stripTime(new Date());
+        const ch = useMemo(() => computeSevenDaysLatte(saved, chStart), [saved, challenge.start]);
+
+        // Uppdatera best/completed automatiskt
+        useEffect(() => {
+          if (!challenge.active) return;
+          if (ch.streak > (challenge.best || 0)) {
+            setChallenge(c => ({ ...c, best: ch.streak }));
           }
-          const arr = Array.from(map.entries()).sort((a,b)=> new Date(a[0])-new Date(b[0]));
-          const values = arr.map(x=>x[1]);
-          const max = Math.max(...values, 1);
-          return arr.map(([k,v]) => ({ date:new Date(k), h: Math.max(6, Math.round(60*v/max)) })); // 6..60 px
-        }, [filtered]);
+          if (ch.complete && !challenge.completedAt) {
+            setChallenge(c => ({ ...c, completedAt: new Date().toISOString() }));
+          }
+        }, [ch.streak, ch.complete]);
+
+        // Snabbknapp: markera “Avstod latte idag” (loggar 0 kr, påverkar inte total)
+        const quickLatteToday = () => {
+          const sid = String(Date.now());
+          setSaved(prev => [{ id:'quick-latte', name:'Latte', price:0, sid, date:new Date().toISOString() }, ...prev]);
+        };
+
+        // Utmaningskontroller
+        const startChallenge = () => setChallenge({ active:true, start:new Date().toISOString(), best:0, completedAt:null });
+        const resetChallenge = () => setChallenge({ active:false, start:null, best:0, completedAt:null });
 
         const tabLabel = { week:"Vecka", month:"Månad", year:"År", all:"Alla" }[tab];
 
@@ -224,19 +253,8 @@ input:-webkit-autofill{
           <>
             {/* Inputrad */}
             <div className="row">
-              <input
-                type="text"
-                placeholder="Namn (t.ex. Latte)"
-                value={newName}
-                onChange={e=>setNewName(e.target.value)}
-              />
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Pris"
-                value={newPrice}
-                onChange={e=>setNewPrice(e.target.value)}
-              />
+              <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
+              <input type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
               <button className="btn btn-add" onClick={addItem}>Lägg till</button>
             </div>
 
@@ -256,15 +274,55 @@ input:-webkit-autofill{
               </div>
             )}
 
+            {/* ====== NYTT: Utmaningar ====== */}
+            <div className="section"><h3>Utmaningar</h3></div>
+            <div className="card challenge">
+              <div className="header">
+                <div className="title">7-dagars <em>no-latte</em></div>
+                {!challenge.active ? (
+                  <button className="btn" onClick={startChallenge}>Starta utmaning</button>
+                ) : (
+                  <div className="actions">
+                    {challenge.completedAt && <span className="badge">🏆 Klar!</span>}
+                    <button className="btn danger" onClick={resetChallenge}>Starta om</button>
+                  </div>
+                )}
+              </div>
+
+              {challenge.active && (
+                <>
+                  <div className="dots">
+                    {ch.days.map((d,i) => (
+                      <div key={i} className={"dot"+(d.ok?" ok":"")} title={d.date.toLocaleDateString()}></div>
+                    ))}
+                  </div>
+                  <div className="streak">
+                    Streak: <strong>{ch.streak}</strong> / 7 • Bästa: <strong>{challenge.best ?? 0}</strong>
+                    {!ch.complete && (
+                      <button style={{marginLeft:12}} className="btn" onClick={quickLatteToday}>
+                        Avstod latte idag
+                      </button>
+                    )}
+                    {ch.complete && <span className="badge">Klart 🎉</span>}
+                  </div>
+                </>
+              )}
+              {!challenge.active && (
+                <div className="streak" style={{color:'var(--muted)'}}>
+                  Logga minst en “Avstod latte” per dag i 7 dagar i rad. Snabbknappen nedan kan hjälpa.
+                  <div style={{marginTop:10}}>
+                    <button className="btn" onClick={quickLatteToday}>Avstod latte idag</button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* ====== /NYTT ====== */}
+
             {/* Tabs */}
             <div className="section"><h3>Översikt</h3></div>
             <div className="tabs">
               {["week","month","year","all"].map(key => (
-                <button
-                  key={key}
-                  className={"tab"+(tab===key?" active":"")}
-                  onClick={()=>setTab(key)}
-                >
+                <button key={key} className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
                   {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
                 </button>
               ))}
@@ -277,7 +335,7 @@ input:-webkit-autofill{
                 <div className="sum-value">{totalSavedPeriod.toFixed(2)} kr</div>
               </div>
               <div className="sum-card">
-                <div className="sum-label">Antal avstådda</div>
+                <div className="sum-label">Antal avståenden</div>
                 <div className="sum-value">{filtered.length}</div>
               </div>
               <div className="sum-card">
@@ -289,23 +347,29 @@ input:-webkit-autofill{
             {/* Mini-bars */}
             {filtered.length > 0 && (
               <div className="card" style={{padding:"6px 8px"}}>
-                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>
-                  Logg för {tabLabel.toLowerCase()}
-                </div>
+                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Logg för {tabLabel.toLowerCase()}</div>
                 <div className="bars">
-                  {bars.map((b, i) => (
-                    <div key={i} className="bar" style={{height:b.h+'px'}} title={b.date.toLocaleDateString()} />
-                  ))}
+                  {(() => {
+                    const map = new Map();
+                    for(const s of filtered){
+                      const key = stripTime(toDate(s.date)).toISOString();
+                      map.set(key, (map.get(key)||0) + (+s.price||0));
+                    }
+                    const arr = Array.from(map.entries()).sort((a,b)=> new Date(a[0])-new Date(b[0]));
+                    const values = arr.map(x=>x[1]);
+                    const max = Math.max(...values, 1);
+                    return arr.map(([k,v], i) => (
+                      <div key={i} className="bar" style={{height: Math.max(6, Math.round(60*v/max))+'px'}} title={new Date(k).toLocaleDateString()}></div>
+                    ));
+                  })()}
                 </div>
               </div>
             )}
 
-            {/* Historik */}
+            {/* Historik (filtrerad av fliken) */}
             <div className="section">
               <h3>Historik – {tabLabel.toLowerCase()}</h3>
-              {saved.length > 0 && (
-                <button className="btn danger" onClick={clearHistory}>Rensa all historik</button>
-              )}
+              {saved.length > 0 && <button className="btn danger" onClick={()=>clearHistory()}>Rensa all historik</button>}
             </div>
 
             {filtered.length === 0 && <div className="empty">Du har inte avstått något i vald period.</div>}
@@ -331,7 +395,7 @@ input:-webkit-autofill{
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
 
-      // ------- Install (PWA) -------
+      // Install (PWA)
       let deferredPrompt;
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -347,7 +411,7 @@ input:-webkit-autofill{
         };
       });
 
-      // ------- Service worker -------
+      // Service worker
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./service-worker.js');
