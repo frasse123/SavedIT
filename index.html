@@ -2,17 +2,14 @@
 <html lang="sv">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
     <title>Saved it</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#0ea5e9" />
     <link rel="icon" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=12" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=11"/>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
@@ -20,73 +17,137 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+      /* ======== BASE / RESET ======== */
       :root{
         --accent:#0f766e; --accent-2:#0ea5a3;
         --bg:#f6f8fb; --surface:#ffffff;
         --text:#0f172a; --muted:#6b7280;
         --border:#e8eaf0; --ring:rgba(14,165,233,.18);
         --green:#22c55e; --red:#ef4444;
+        color-scheme: light;
       }
-      :root { color-scheme: light; }
-      html { -webkit-text-size-adjust: 100%; }
+      html { -webkit-text-size-adjust:100%; }
       *,*::before,*::after{ box-sizing:border-box; }
-      html,body{ width:100%; max-width:100%; overflow-x:hidden; }
-      body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; color:var(--text); background:var(--bg); }
-
-      /* HERO */
-      .hero{
-        background: radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
-                    linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
-        padding: max(28px, calc(env(safe-area-inset-top) + 18px)) 0 28px;
-        border-bottom: 1px solid var(--border);
+      html,body{ width:100%; max-width:100%; overflow-x:hidden; margin:0; }
+      body{
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        color:var(--text); background:var(--bg);
       }
-      .wrap{ max-width: 860px; margin: 0 auto; padding: 0 22px 28px; }
-      .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+
+      /* ======== HERO ======== */
+      .hero{
+        background:
+          radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
+          linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
+        padding:max(28px, calc(env(safe-area-inset-top) + 18px)) 0 28px;
+        border-bottom:1px solid var(--border);
+        position:sticky; top:0; z-index:40;
+      }
+      .wrap{ max-width:860px; margin:0 auto; padding:0 22px 28px; }
+      .top{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+      .left{ display:flex; align-items:center; gap:12px; }
+      .burger{
+        width:40px; height:40px; border-radius:10px; border:1px solid var(--border);
+        background:#fff; display:grid; place-items:center; cursor:pointer;
+        box-shadow:0 2px 10px rgba(2,6,23,.06);
+      }
+      .burger > span{
+        width:18px; height:2px; background:#0f172a; position:relative; display:block;
+      }
+      .burger > span::before,.burger > span::after{
+        content:""; position:absolute; left:0; right:0; height:2px; background:#0f172a;
+      }
+      .burger > span::before{ top:-6px; }
+      .burger > span::after{ top:6px; }
+
       .brand{ display:flex; align-items:center; gap:12px; }
-      .logo{ width: 38px; height: 38px; border-radius: 12px; background: conic-gradient(from 200deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);}
-      .brand h1{ font-size: 30px; line-height:1.1; margin:0; letter-spacing:-0.01em; }
+      .logo{
+        width:38px; height:38px; border-radius:12px;
+        background:conic-gradient(from 200deg, var(--accent), var(--accent-2));
+        box-shadow:0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);
+      }
+      .brand h1{ font-size:30px; line-height:1.1; margin:0; letter-spacing:-.01em; }
       .subtitle{ color:var(--muted); margin:6px 0 0 50px; }
 
-      .install{ padding:10px 14px; border-radius: 999px; background:#fff; border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06); }
+      .install{
+        padding:10px 14px; border-radius:999px; background:#fff;
+        border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06);
+      }
       .install[hidden]{ display:none; }
 
-      .content{ max-width: 860px; margin: 0 auto; padding: 22px; }
+      .content{ max-width:860px; margin:0 auto; padding:22px; }
 
-      /* Inputs */
-      .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
-      @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
+      /* ======== DRAWER ======== */
+      .backdrop{
+        position:fixed; inset:0; background:rgba(15,23,42,.35);
+        opacity:0; pointer-events:none; transition:opacity .15s ease; z-index:49;
+      }
+      .backdrop.open{ opacity:1; pointer-events:auto; }
+      .drawer{
+        position:fixed; inset:0 auto 0 0; width:280px; max-width:85%;
+        background:#fff; border-right:1px solid var(--border);
+        box-shadow: 6px 0 24px rgba(15,23,42,.12);
+        transform:translateX(-100%); transition:transform .2s ease; z-index:50;
+        display:flex; flex-direction:column;
+      }
+      .drawer.open{ transform:translateX(0); }
+      .drawer header{ padding:18px 16px; border-bottom:1px solid var(--border); font-weight:700; }
+      .menu{ padding:8px; display:flex; flex-direction:column; gap:6px; }
+      .menu .item{
+        padding:10px 12px; border-radius:10px; border:1px solid transparent;
+        display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:600; color:#0f172a;
+      }
+      .menu .item:hover{ background:#f7fafc; border-color:#e8eaf0; }
+      .menu .item.active{
+        background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff;
+      }
+
+      /* ======== Inputs / Buttons / Cards (delas mellan vyer) ======== */
+      .row{ display:grid; grid-template-columns:1fr 160px auto; gap:10px; margin:10px 0 18px; }
+      @media (max-width:560px){ .row{ grid-template-columns:1fr; } }
+
       input[type="text"], input[type="number"]{
-        width:100%; max-width:100%; min-width:0;
-        padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
-        font-size:17px !important; color:var(--text); caret-color:var(--text);
-        outline:none; transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.03);
+        width:100%; padding:12px 14px;
+        border:1px solid var(--border); border-radius:12px; background:#fff;
+        font-size:17px; color:var(--text); caret-color:var(--text);
+        outline:none; transition:border-color .15s, box-shadow .15s;
+        box-shadow:0 1px 0 rgba(15,23,42,.03);
       }
       input::placeholder{ color:#9aa0a6; opacity:1; }
-      input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
-      input:-webkit-autofill{ -webkit-text-fill-color: var(--text) !important; box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset; }
+      input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+      input:-webkit-autofill{
+        -webkit-text-fill-color:var(--text)!important;
+        box-shadow:0 0 0 1000px #fff inset; -webkit-box-shadow:0 0 0 1000px #fff inset;
+      }
 
-      .btn{ padding: 11px 14px; border-radius: 12px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer; font-weight:600; transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05); }
-      .btn:active{ transform: translateY(1px); }
-      .btn-add{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; box-shadow: 0 8px 20px rgba(15,118,110,.25); }
+      .btn{
+        padding:11px 14px; border-radius:12px; border:1px solid var(--border);
+        background:#fff; color:var(--text); cursor:pointer; font-weight:600;
+        transition:transform .06s, box-shadow .15s; box-shadow:0 1px 0 rgba(15,23,42,.05);
+      }
+      .btn:active{ transform:translateY(1px); }
+      .btn-add{
+        background:linear-gradient(135deg, var(--accent), var(--accent-2));
+        color:#fff; border-color:transparent; box-shadow:0 8px 20px rgba(15,118,110,.25);
+      }
+      .btn-ghost{ background:#fff; }
+      .save{ background:#22c55e; border-color:#22c55e; color:#fff; }
+      .danger{ background:#ef4444; border-color:#ef4444; color:#fff; }
 
-      .card{ background: var(--surface); border:1px solid var(--border); border-radius: 16px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
-      .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-      .list-item:last-child{ border-bottom: 0; }
+      .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:0 2px 12px rgba(15,23,42,.06); }
+      .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border-bottom:1px solid var(--border); }
+      .list-item:last-child{ border-bottom:0; }
 
-      .actions{ display:flex; gap: 8px; }
-      .save   { background: #22c55e; border-color:#22c55e; color:#fff; }
-      .danger { background: #ef4444; border-color:#ef4444; color:#fff; }
-
-      .section{ display:flex; align-items:center; justify-content:space-between; margin: 22px 0 12px; }
-      .section h3{ margin:0; font-size: 16px; letter-spacing: .02em; color:#111; }
+      .section{ display:flex; align-items:center; justify-content:space-between; margin:22px 0 12px; }
+      .section h3{ margin:0; font-size:16px; letter-spacing:.02em; color:#111; }
       .muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
 
       .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px; }
       .tab{ padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; font-weight:600; color:#334155; }
-      .tab.active{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
+      .tab.active{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
 
-      .summary{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 16px; }
-      @media (max-width: 560px){ .summary{ grid-template-columns: 1fr; } }
+      .summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 16px; }
+      @media (max-width:560px){ .summary{ grid-template-columns:1fr; } }
       .sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
       .sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
       .sum-value{ font-size:18px; font-weight:700; }
@@ -94,28 +155,40 @@
       .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
       .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
 
-      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
-      .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
+      .stats{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:0 -1px 10px rgba(15,23,42,.06); }
+      .empty{ text-align:center; color:var(--muted); padding:18px 10px; }
 
-      /* ====== NYTT: Utmaningskort ====== */
-      .challenge{ margin: 10px 0 16px; }
-      .challenge .header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; }
-      .challenge .title{ font-weight:700; }
-      .dots{ display:flex; gap:8px; padding: 0 16px 14px; }
-      .dot{ width:18px; height:18px; border-radius:50%; border:1px solid var(--border); background:#fff; }
-      .dot.ok{ background: var(--green); border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
-      .streak{ padding: 0 16px 14px; color:#334155; font-size:14px; }
-      .badge{ margin-left:8px; padding:2px 8px; border-radius:999px; background:#fec84b; font-size:12px; font-weight:700; }
+      /* ======== Sparmål specifikt ======== */
+      .goal-card{ padding:14px 16px; display:grid; gap:10px; }
+      .progress{ height:10px; background:#eef2f7; border-radius:999px; overflow:hidden; border:1px solid var(--border); }
+      .progress > div{ height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); }
+      .goal-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+      .row-goal{ display:grid; grid-template-columns:1fr 140px auto; gap:10px; margin:10px 0 16px; }
+      @media (max-width:560px){ .row-goal{ grid-template-columns:1fr; } }
     </style>
   </head>
 
   <body>
+    <!-- Drawer -->
+    <div id="backdrop" class="backdrop"></div>
+    <nav id="drawer" class="drawer" aria-hidden="true">
+      <header>Meny</header>
+      <div class="menu">
+        <button class="item" data-view="home">Översikt</button>
+        <button class="item" data-view="goals">Sparmål</button>
+      </div>
+    </nav>
+
+    <!-- Top -->
     <header class="hero">
       <div class="wrap">
         <div class="top">
-          <div class="brand">
-            <div class="logo"></div>
-            <h1>Saved it</h1>
+          <div class="left">
+            <button id="burgerBtn" class="burger" aria-label="Öppna meny"><span></span></button>
+            <div class="brand">
+              <div class="logo"></div>
+              <h1>Saved it</h1>
+            </div>
           </div>
           <button id="installBtn" class="install btn" hidden>Installera appen</button>
         </div>
@@ -123,9 +196,8 @@
       </div>
     </header>
 
-    <main class="content">
-      <div id="root"></div>
-    </main>
+    <!-- Content -->
+    <main class="content"><div id="root"></div></main>
 
     <!-- React via CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -135,134 +207,76 @@
     <script type="text/babel">
       const { useState, useEffect, useMemo } = React;
 
-      // Storage helpers
-      const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
-      const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      // Helpers för lokal lagring
+      const load = (k,f)=>{ try{const v=localStorage.getItem(k); return v?JSON.parse(v):f;}catch{return f;} };
+      const save = (k,v)=>localStorage.setItem(k, JSON.stringify(v));
 
-      // Date utilities
-      const toDate = (iso) => new Date(iso);
-      const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
-      const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
-      const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
-      const isInRange = (date, start) => stripTime(date) >= stripTime(start);
+      // Datum-hjälp
+      const toDate = (iso)=>new Date(iso);
+      const stripTime = (d)=>new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const startOfWeek = (d)=>{ const day=d.getDay(); const diff=(day===0?-6:1)-day; const s=new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
+      const startOfMonth=(d)=>new Date(d.getFullYear(), d.getMonth(), 1);
+      const startOfYear =(d)=>new Date(d.getFullYear(), 0, 1);
+      const isInRange=(date,start)=>stripTime(date)>=stripTime(start);
 
-      /* ============ NYTT: latte-matchning + utmanings-helpers ============ */
-      const normalize = (s='') => s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase().trim();
-      const isLatte = (name='') => normalize(name).includes('latte');
+      /* ---------------- ÖVERSIKT ---------------- */
+      function Overview({ items, setItems, saved, setSaved }){
+        const [newName,setNewName]=useState("");
+        const [newPrice,setNewPrice]=useState("");
+        const [tab,setTab]=useState("week");
 
-      // Bygg array för de senaste 7 dagarna (inkl. idag), med true/false om "latte avstod"
-      function computeSevenDaysLatte(saved, fromDate = stripTime(new Date())) {
-        const today = stripTime(new Date());
-        // 7 dagar bakåt från idag
-        const days = Array.from({length:7}, (_,i) => {
-          const d = new Date(today); d.setDate(today.getDate() - (6-i));
-          return { date: d, ok:false };
-        });
-        for (const s of saved) {
-          if (!isLatte(s.name)) continue;
-          const sd = stripTime(toDate(s.date)).getTime();
-          for (const d of days) {
-            if (sd === d.date.getTime() && sd >= stripTime(fromDate).getTime()) {
-              d.ok = true;
-            }
-          }
-        }
-        const allOk = days.every(d => d.ok);
-        // Streak (räkna från idag bakåt)
-        let streak = 0;
-        for (let i=days.length-1; i>=0; i--) {
-          if (days[i].ok) streak++; else break;
-        }
-        return { days, streak, complete: allOk };
-      }
+        useEffect(()=>save("items",items),[items]);
+        useEffect(()=>save("saved",saved),[saved]);
 
-      function App(){
-        const [items, setItems]   = useState(() => load("items", []));
-        const [saved, setSaved]   = useState(() => load("saved", []));
-        const [newName, setNewName] = useState("");
-        const [newPrice, setNewPrice] = useState("");
-        const [tab, setTab] = useState("week"); // week | month | year | all
-
-        // NYTT: utmanings-state
-        const [challenge, setChallenge] = useState(() =>
-          load("chalNoLatte", { active:false, start:null, best:0, completedAt:null })
-        );
-
-        useEffect(() => save("items", items), [items]);
-        useEffect(() => save("saved", saved), [saved]);
-        useEffect(() => save("chalNoLatte", challenge), [challenge]);
-
-        const addItem = () => {
-          if(!newName.trim() || !newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
-          const price = Number(newPrice.replace(",", "."));
-          if(Number.isNaN(price) || price <= 0){ alert("Ange ett giltigt pris"); return; }
-          setItems(prev => [...prev, { id: String(Date.now()), name: newName.trim(), price }]);
+        const addItem=()=>{
+          if(!newName.trim()||!newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
+          const price=Number(newPrice.replace(",","."));
+          if(Number.isNaN(price)||price<=0){ alert("Ange ett giltigt pris"); return; }
+          setItems(prev=>[...prev,{id:String(Date.now()),name:newName.trim(),price}]);
           setNewName(""); setNewPrice("");
         };
-        const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
-        const saveMoney  = (item) => setSaved(prev => [{...item, sid:String(Date.now()), date:new Date().toISOString()}, ...prev]);
-        const deleteSaved= (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
-        const clearHistory = () => { if(confirm("Rensa hela historiken?")) setSaved([]); };
+        const removeItem=(id)=>setItems(prev=>prev.filter(i=>i.id!==id));
+        const saveMoney =(item)=>setSaved(prev=>[{...item,sid:String(Date.now()),date:new Date().toISOString()},...prev]);
+        const deleteSaved=(sid)=>setSaved(prev=>prev.filter(s=>s.sid!==sid));
+        const clearHistory=()=>{ if(confirm("Rensa hela historiken?")) setSaved([]); };
 
-        // Filterad historik per flik
-        const today = new Date();
-        const periodStart = useMemo(() => {
-          if(tab === "week")  return startOfWeek(today);
-          if(tab === "month") return startOfMonth(today);
-          if(tab === "year")  return startOfYear(today);
-          return new Date(0); // all
-        }, [tab]);
+        const today=new Date();
+        const periodStart=useMemo(()=>{
+          if(tab==="week") return startOfWeek(today);
+          if(tab==="month") return startOfMonth(today);
+          if(tab==="year") return startOfYear(today);
+          return new Date(0);
+        },[tab]);
 
-        const filtered = useMemo(() => {
-          return saved.filter(s => isInRange(toDate(s.date), periodStart));
-        }, [saved, periodStart]);
+        const filtered=useMemo(()=>saved.filter(s=>isInRange(toDate(s.date),periodStart)),[saved,periodStart]);
+        const totalAll=useMemo(()=>saved.reduce((a,s)=>a+(+s.price||0),0),[saved]);
+        const totalPeriod=useMemo(()=>filtered.reduce((a,s)=>a+(+s.price||0),0),[filtered]);
 
-        // Summeringar
-        const totalSavedAll   = useMemo(() => saved.reduce((a,s)=>a+(+s.price||0),0), [saved]);
-        const totalSavedPeriod= useMemo(() => filtered.reduce((a,s)=>a+(+s.price||0),0), [filtered]);
-
-        // NYTT: räkna utmaningen dynamiskt från sparad data
-        const chStart = challenge.start ? stripTime(new Date(challenge.start)) : stripTime(new Date());
-        const ch = useMemo(() => computeSevenDaysLatte(saved, chStart), [saved, challenge.start]);
-
-        // Uppdatera best/completed automatiskt
-        useEffect(() => {
-          if (!challenge.active) return;
-          if (ch.streak > (challenge.best || 0)) {
-            setChallenge(c => ({ ...c, best: ch.streak }));
+        const bars=useMemo(()=>{
+          const map=new Map();
+          for(const s of filtered){
+            const key=stripTime(toDate(s.date)).toISOString();
+            map.set(key,(map.get(key)||0)+(+s.price||0));
           }
-          if (ch.complete && !challenge.completedAt) {
-            setChallenge(c => ({ ...c, completedAt: new Date().toISOString() }));
-          }
-        }, [ch.streak, ch.complete]);
+          const arr=[...map.entries()].sort((a,b)=>new Date(a[0])-new Date(b[0]));
+          const values=arr.map(x=>x[1]); const max=Math.max(...values,1);
+          return arr.map(([k,v])=>({date:new Date(k), h:Math.max(6,Math.round(60*v/max))}));
+        },[filtered]);
 
-        // Snabbknapp: markera “Avstod latte idag” (loggar 0 kr, påverkar inte total)
-        const quickLatteToday = () => {
-          const sid = String(Date.now());
-          setSaved(prev => [{ id:'quick-latte', name:'Latte', price:0, sid, date:new Date().toISOString() }, ...prev]);
-        };
-
-        // Utmaningskontroller
-        const startChallenge = () => setChallenge({ active:true, start:new Date().toISOString(), best:0, completedAt:null });
-        const resetChallenge = () => setChallenge({ active:false, start:null, best:0, completedAt:null });
-
-        const tabLabel = { week:"Vecka", month:"Månad", year:"År", all:"Alla" }[tab];
+        const tabLabel={week:"Vecka",month:"Månad",year:"År",all:"Alla"}[tab];
 
         return (
           <>
-            {/* Inputrad */}
             <div className="row">
               <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
               <input type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
               <button className="btn btn-add" onClick={addItem}>Lägg till</button>
             </div>
 
-            {/* Möjliga impulsköp */}
-            {items.length === 0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
-            {items.length > 0 && (
+            {items.length===0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
+            {items.length>0 && (
               <div className="card">
-                {items.map(item => (
+                {items.map(item=>(
                   <div className="list-item" key={item.id}>
                     <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
                     <div className="actions">
@@ -274,108 +288,39 @@
               </div>
             )}
 
-            {/* ====== NYTT: Utmaningar ====== */}
-            <div className="section"><h3>Utmaningar</h3></div>
-            <div className="card challenge">
-              <div className="header">
-                <div className="title">7-dagars <em>no-latte</em></div>
-                {!challenge.active ? (
-                  <button className="btn" onClick={startChallenge}>Starta utmaning</button>
-                ) : (
-                  <div className="actions">
-                    {challenge.completedAt && <span className="badge">🏆 Klar!</span>}
-                    <button className="btn danger" onClick={resetChallenge}>Starta om</button>
-                  </div>
-                )}
-              </div>
-
-              {challenge.active && (
-                <>
-                  <div className="dots">
-                    {ch.days.map((d,i) => (
-                      <div key={i} className={"dot"+(d.ok?" ok":"")} title={d.date.toLocaleDateString()}></div>
-                    ))}
-                  </div>
-                  <div className="streak">
-                    Streak: <strong>{ch.streak}</strong> / 7 • Bästa: <strong>{challenge.best ?? 0}</strong>
-                    {!ch.complete && (
-                      <button style={{marginLeft:12}} className="btn" onClick={quickLatteToday}>
-                        Avstod latte idag
-                      </button>
-                    )}
-                    {ch.complete && <span className="badge">Klart 🎉</span>}
-                  </div>
-                </>
-              )}
-              {!challenge.active && (
-                <div className="streak" style={{color:'var(--muted)'}}>
-                  Logga minst en “Avstod latte” per dag i 7 dagar i rad. Snabbknappen nedan kan hjälpa.
-                  <div style={{marginTop:10}}>
-                    <button className="btn" onClick={quickLatteToday}>Avstod latte idag</button>
-                  </div>
-                </div>
-              )}
-            </div>
-            {/* ====== /NYTT ====== */}
-
-            {/* Tabs */}
             <div className="section"><h3>Översikt</h3></div>
             <div className="tabs">
-              {["week","month","year","all"].map(key => (
+              {["week","month","year","all"].map(key=>(
                 <button key={key} className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
-                  {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
+                  {{week:"Vecka",month:"Månad",year:"År",all:"Alla"}[key]}
                 </button>
               ))}
             </div>
 
-            {/* Summary-kort */}
             <div className="summary">
-              <div className="sum-card">
-                <div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div>
-                <div className="sum-value">{totalSavedPeriod.toFixed(2)} kr</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Antal avståenden</div>
-                <div className="sum-value">{filtered.length}</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Totalt (alla tider)</div>
-                <div className="sum-value">{totalSavedAll.toFixed(2)} kr</div>
-              </div>
+              <div className="sum-card"><div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div><div className="sum-value">{totalPeriod.toFixed(2)} kr</div></div>
+              <div className="sum-card"><div className="sum-label">Antal avståenden</div><div className="sum-value">{filtered.length}</div></div>
+              <div className="sum-card"><div className="sum-label">Totalt (alla tider)</div><div className="sum-value">{totalAll.toFixed(2)} kr</div></div>
             </div>
 
-            {/* Mini-bars */}
-            {filtered.length > 0 && (
+            {filtered.length>0 && (
               <div className="card" style={{padding:"6px 8px"}}>
-                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Logg för {tabLabel.toLowerCase()}</div>
+                <div style={{padding:"6px 10px",fontWeight:600,color:"#334155"}}>Logg för {tabLabel.toLowerCase()}</div>
                 <div className="bars">
-                  {(() => {
-                    const map = new Map();
-                    for(const s of filtered){
-                      const key = stripTime(toDate(s.date)).toISOString();
-                      map.set(key, (map.get(key)||0) + (+s.price||0));
-                    }
-                    const arr = Array.from(map.entries()).sort((a,b)=> new Date(a[0])-new Date(b[0]));
-                    const values = arr.map(x=>x[1]);
-                    const max = Math.max(...values, 1);
-                    return arr.map(([k,v], i) => (
-                      <div key={i} className="bar" style={{height: Math.max(6, Math.round(60*v/max))+'px'}} title={new Date(k).toLocaleDateString()}></div>
-                    ));
-                  })()}
+                  {bars.map((b,i)=>(<div key={i} className="bar" style={{height:b.h+"px"}} title={b.date.toLocaleDateString()} />))}
                 </div>
               </div>
             )}
 
-            {/* Historik (filtrerad av fliken) */}
             <div className="section">
               <h3>Historik – {tabLabel.toLowerCase()}</h3>
-              {saved.length > 0 && <button className="btn danger" onClick={()=>clearHistory()}>Rensa all historik</button>}
+              {saved.length>0 && <button className="btn danger" onClick={clearHistory}>Rensa all historik</button>}
             </div>
 
-            {filtered.length === 0 && <div className="empty">Du har inte avstått något i vald period.</div>}
-            {filtered.length > 0 && (
+            {filtered.length===0 && <div className="empty">Du har inte avstått något i vald period.</div>}
+            {filtered.length>0 && (
               <div className="card">
-                {filtered.slice(0,100).map(s => (
+                {filtered.slice(0,100).map(s=>(
                   <div className="list-item" key={s.sid}>
                     <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
                     <div className="actions">
@@ -387,13 +332,131 @@
               </div>
             )}
 
-            <div className="stats"><b>Totalt sparat: {totalSavedAll.toFixed(2)} kr</b></div>
+            <div className="stats"><b>Totalt sparat: {totalAll.toFixed(2)} kr</b></div>
+          </>
+        );
+      }
+
+      /* ---------------- SPARMÅL ---------------- */
+      function Goals(){
+        const [goals,setGoals]=useState(()=>load("goals",[]));
+        const [name,setName]=useState("");
+        const [target,setTarget]=useState("");
+
+        useEffect(()=>save("goals",goals),[goals]);
+
+        const addGoal=()=>{
+          if(!name.trim()||!target.trim()){ alert("Fyll i både namn och målbelopp"); return; }
+          const t=Number(target.replace(",","."));
+          if(Number.isNaN(t)||t<=0){ alert("Ange ett giltigt målbelopp"); return; }
+          setGoals(prev=>[{id:String(Date.now()), name:name.trim(), target:t, deposits:[]}, ...prev]);
+          setName(""); setTarget("");
+        };
+        const removeGoal=(id)=>{ if(confirm("Ta bort målet?")) setGoals(prev=>prev.filter(g=>g.id!==id)); };
+        const addDeposit=(id,amount)=>{
+          const a=Number(amount.replace(",","."));
+          if(Number.isNaN(a)||a<=0){ alert("Ange giltigt belopp"); return; }
+          setGoals(prev=>prev.map(g=>g.id===id?{...g, deposits:[{id:String(Date.now()), amount:a, date:new Date().toISOString()}, ...g.deposits]}:g));
+        };
+
+        return (
+          <>
+            <div className="section"><h3>Sparmål</h3></div>
+
+            <div className="card" style={{padding:"14px 16px", marginBottom:"12px"}}>
+              <div className="row-goal">
+                <input type="text" placeholder="Namn på mål (t.ex. Nödfond)" value={name} onChange={e=>setName(e.target.value)} />
+                <input type="number" step="0.01" placeholder="Målbelopp (kr)" value={target} onChange={e=>setTarget(e.target.value)} />
+                <button className="btn btn-add" onClick={addGoal}>Skapa mål</button>
+              </div>
+              <div className="muted" style={{textAlign:"left"}}>Tips: Lägg till insättningar när du vill. (Vi kan koppla ”avstod” hit senare.)</div>
+            </div>
+
+            {goals.length===0 && <div className="empty">Inga sparmål ännu.</div>}
+            {goals.map(g=>{
+              const total=g.deposits.reduce((s,d)=>s+(+d.amount||0),0);
+              const pct=Math.min(100, Math.round((total/(g.target||1))*100));
+              let addVal=""; // local input per render – enkelt för nu
+              return (
+                <div className="card goal-card" key={g.id}>
+                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:"10px"}}>
+                    <div style={{fontWeight:700, fontSize:"16px"}}>{g.name}</div>
+                    <button className="btn danger btn-ghost" onClick={()=>removeGoal(g.id)}>Ta bort</button>
+                  </div>
+                  <div className="muted" style={{textAlign:"left"}}>Mål: {g.target.toFixed(2)} kr · Sparat: {total.toFixed(2)} kr ({pct}%)</div>
+                  <div className="progress"><div style={{width:pct+"%"}}></div></div>
+                  <div className="goal-actions">
+                    <input type="number" step="0.01" placeholder="Insättning (kr)"
+                      onChange={e=>{addVal=e.target.value;}} />
+                    <button className="btn save" onClick={()=>addDeposit(g.id, addVal||"")}>Lägg till insättning</button>
+                  </div>
+                  {g.deposits.length>0 && (
+                    <div className="muted" style={{textAlign:"left"}}>
+                      Senaste: {g.deposits[0].amount.toFixed(2)} kr · {new Date(g.deposits[0].date).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        );
+      }
+
+      /* ---------------- SHELL / ROUTING ---------------- */
+      function AppShell(){
+        const [items,setItems]=useState(()=>load("items",[]));
+        const [saved,setSaved]=useState(()=>load("saved",[]));
+
+        const [view,setView]=useState("home");  // "home" | "goals"
+        const [open,setOpen]=useState(false);
+
+        useEffect(()=>{
+          const bd=document.getElementById("backdrop");
+          const dr=document.getElementById("drawer");
+          const menuBtns=dr.querySelectorAll(".menu .item");
+          const burger=document.getElementById("burgerBtn");
+
+          const close=()=>{ setOpen(false); };
+          const openFn=()=>{ setOpen(true); };
+
+          burger.addEventListener("click", openFn);
+          bd.addEventListener("click", close);
+          menuBtns.forEach(btn=>{
+            btn.addEventListener("click", ()=>{
+              setView(btn.getAttribute("data-view"));
+              close();
+            });
+          });
+
+          return ()=>{
+            burger.removeEventListener("click", openFn);
+            bd.removeEventListener("click", close);
+            menuBtns.forEach(btn=>btn.replaceWith(btn.cloneNode(true))); // detach listeners
+          };
+        },[]);
+
+        useEffect(()=>{
+          const bd=document.getElementById("backdrop");
+          const dr=document.getElementById("drawer");
+          bd.classList.toggle("open", open);
+          dr.classList.toggle("open", open);
+          dr.setAttribute("aria-hidden", open ? "false" : "true");
+          // active state
+          dr.querySelectorAll(".menu .item").forEach(b=>{
+            b.classList.toggle("active", b.getAttribute("data-view")===view);
+          });
+        },[open,view]);
+
+        return (
+          <>
+            {view==="home"  && <Overview items={items} setItems={setItems} saved={saved} setSaved={setSaved} />}
+            {view==="goals" && <Goals />}
           </>
         );
       }
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
+      root.render(<AppShell />);
 
       // Install (PWA)
       let deferredPrompt;
