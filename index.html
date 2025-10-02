@@ -2,19 +2,23 @@
 <html lang="sv">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    />
     <title>Saved it</title>
 
-    <!-- PWA (frivilligt) -->
+    <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="theme-color" content="#0ea5e9" />
+    <!-- Matchar bakgrunden (fixar blå listen) -->
+    <meta name="theme-color" content="#f6f8fb" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="icon" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
     <style>
       :root{
@@ -26,56 +30,81 @@
       }
       :root { color-scheme: light; }
       html { -webkit-text-size-adjust: 100%; }
-      body{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; color:var(--text); background:var(--bg); }
-      *, *::before, *::after { box-sizing: border-box; }
-      html, body { width:100%; max-width:100%; overflow-x:hidden; }
-      input, button, select, textarea { width:100%; max-width:100%; min-width:0; }
-      button { -webkit-tap-highlight-color: transparent; }
+      body{
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin:0; color:var(--text); background:var(--bg);
+      }
+      *,*::before,*::after{ box-sizing:border-box; }
+      html,body{ width:100%; max-width:100%; overflow-x:hidden; }
+      input,button,select,textarea{ width:100%; max-width:100%; min-width:0; }
 
       /* HERO */
       .hero{
-        background: radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
-                    linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
+        background:
+          radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
+          linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
         padding: max(28px, calc(env(safe-area-inset-top) + 18px)) 0 28px;
         border-bottom: 1px solid var(--border);
       }
       .wrap{ max-width: 860px; margin: 0 auto; padding: 0 22px 28px; }
       .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
       .brand{ display:flex; align-items:center; gap:12px; }
-      .logo{ width: 38px; height: 38px; border-radius: 12px; background: conic-gradient(from 200deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);}
+      .logo{
+        width: 38px; height: 38px; border-radius: 12px;
+        background: conic-gradient(from 200deg, var(--accent), var(--accent-2));
+        box-shadow: 0 6px 18px rgba(15,118,110,.25), inset 0 1px 3px rgba(255,255,255,.6);
+      }
       .brand h1{ font-size: 30px; line-height:1.1; margin:0; letter-spacing:-0.01em; }
       .subtitle{ color:var(--muted); margin:6px 0 0 50px; }
 
-      .install{ padding:10px 14px; border-radius: 999px; background:#fff; border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06); width:auto; }
+      .install{
+        padding:10px 14px; border-radius: 999px; background:#fff;
+        border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06);
+        width:auto;
+      }
       .install[hidden]{ display:none; }
 
-      /* MENU BTN (hamburger) */
-      .menu-btn { width:38px; height:38px; border-radius:10px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; }
-      .menu-btn span{ display:block; width:18px; height:2px; background:#0f172a; position:relative; }
-      .menu-btn span::before, .menu-btn span::after{ content:""; position:absolute; left:0; width:18px; height:2px; background:#0f172a; }
-      .menu-btn span::before{ top:-6px; } .menu-btn span::after{ top:6px; }
-
       .content{ max-width: 860px; margin: 0 auto; padding: 22px; }
+
+      /* Top tabs (Logg / Sparmål) */
+      .navtabs{ display:flex; gap:10px; margin: 10px 0 12px; flex-wrap:wrap; }
+      .navtab{
+        padding:10px 14px; border-radius:999px; border:1px solid var(--border);
+        background:#fff; font-weight:600; cursor:pointer;
+      }
+      .navtab.active{
+        background:linear-gradient(135deg, var(--accent), var(--accent-2));
+        color:#fff; border-color:transparent;
+      }
 
       /* Inputs */
       .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
       @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
       input[type="text"], input[type="number"]{
-        width:100%; padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
+        padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
         font-size:17px !important; color:var(--text); caret-color:var(--text);
         outline:none; transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.03);
       }
       input::placeholder{ color:#9aa0a6; opacity:1; }
       input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
-      input:-webkit-autofill{ -webkit-text-fill-color: var(--text) !important; box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset; }
+      input:-webkit-autofill{
+        -webkit-text-fill-color: var(--text) !important;
+        box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset;
+      }
 
-      .btn{ padding: 11px 14px; border-radius: 12px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer; font-weight:600; transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05); width:auto; }
+      .btn{
+        padding: 11px 14px; border-radius: 12px; border:1px solid var(--border);
+        background:#fff; color:var(--text); cursor:pointer; font-weight:600;
+        transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05);
+        width:auto;
+      }
       .btn:active{ transform: translateY(1px); }
       .btn-add{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; box-shadow: 0 8px 20px rgba(15,118,110,.25); }
 
       .card{ background: var(--surface); border:1px solid var(--border); border-radius: 16px; box-shadow: 0 2px 12px rgba(15,23,42,.06); }
       .list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
       .list-item:last-child{ border-bottom: 0; }
+
       .actions{ display:flex; gap: 8px; }
       .save   { background: #22c55e; border-color:#22c55e; color:#fff; }
       .danger { background: #ef4444; border-color:#ef4444; color:#fff; }
@@ -84,35 +113,27 @@
       .section h3{ margin:0; font-size: 16px; letter-spacing: .02em; color:#111; }
       .muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
 
-      /* Tabs */
+      /* Tabs för period */
       .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px; }
       .tab{ padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; font-weight:600; color:#334155; }
       .tab.active{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
 
-      /* Summary */
       .summary{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 16px; }
       @media (max-width: 560px){ .summary{ grid-template-columns: 1fr; } }
       .sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
       .sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
       .sum-value{ font-size:18px; font-weight:700; }
 
-      /* Bars */
-      .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
-      .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
-
       .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
       .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
 
-      /* Drawer */
-      .drawer{ position:fixed; inset:0; background:rgba(2,6,23,.28); display:none; z-index:99; }
-      .drawer.open{ display:block; }
-      .panel{ position:absolute; top:0; left:0; width:280px; max-width:85%; height:100%; background:#fff; border-right:1px solid var(--border); box-shadow: 0 4px 24px rgba(2,6,23,.15); padding:18px; }
-      .panel h4{ margin:0 0 8px; }
-      .nav-btn{ display:block; width:100%; text-align:left; margin:6px 0; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#fff; font-weight:600; }
-      .nav-btn.active{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
-
-      /* iOS: om sticky-footer jiddrar kan vi slå av den så här:
-      @supports (-webkit-touch-callout: none) { .stats { position: static; } } */
+      /* Sparmål */
+      .chips{ display:flex; flex-wrap:wrap; gap:6px; }
+      .chip{ padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff; font-size:12px; cursor:pointer; }
+      .goal-card{ padding:14px; border:1px solid var(--border); border-radius:14px; background:#fff; margin:12px 0; }
+      .goal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .progress{ height:10px; border-radius:999px; background:#eef2f7; overflow:hidden; }
+      .progress > div{ height:100%; background:linear-gradient(135deg, var(--accent), var(--accent-2)); }
     </style>
   </head>
 
@@ -120,35 +141,23 @@
     <header class="hero">
       <div class="wrap">
         <div class="top">
-          <button id="menuBtn" class="menu-btn" type="button" aria-label="Meny"><span></span></button>
           <div class="brand">
             <div class="logo"></div>
             <h1>Saved it</h1>
           </div>
-          <button id="installBtn" class="install btn" type="button" hidden>Installera appen</button>
+          <button id="installBtn" class="install btn" hidden>Installera appen</button>
         </div>
         <p class="subtitle">Logga impulsköp du avstår. Spara pengar. Allt lagras lokalt på enheten.</p>
       </div>
     </header>
 
     <main class="content">
+      <div class="navtabs">
+        <button class="navtab active" id="tab-log">Logg & översikt</button>
+        <button class="navtab" id="tab-goals">Sparmål</button>
+      </div>
       <div id="root"></div>
     </main>
-
-    <!-- Drawer -->
-    <div id="drawer" class="drawer" aria-hidden="true">
-      <div class="panel">
-        <h4>Meny</h4>
-        <button class="nav-btn" data-view="log"        type="button">Logg & översikt</button>
-        <button class="nav-btn" data-view="goals"      type="button">Sparmål</button>
-        <button class="nav-btn" data-view="insights"   type="button">Insikter</button>
-        <button class="nav-btn" data-view="history"    type="button">Historik</button>
-        <button class="nav-btn" data-view="categories" type="button">Kategorier</button>
-        <button class="nav-btn" data-view="settings"   type="button">Inställningar</button>
-        <button class="nav-btn" data-view="about"      type="button">Om</button>
-        <button class="nav-btn" data-view="feedback"   type="button">Feedback</button>
-      </div>
-    </div>
 
     <!-- React via CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -156,14 +165,13 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-      const FEEDBACK_EMAIL = "din@epost.se"; // <-- BYT TILL DIN ADRESS
-      const { useState, useEffect, useMemo, useRef } = React;
+      const { useState, useEffect, useMemo } = React;
 
-      // Storage
+      // Storage helpers
       const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
       const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-      // Date utils
+      // Date utilities
       const toDate = (iso) => new Date(iso);
       const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
@@ -172,53 +180,42 @@
       const isInRange = (date, start) => stripTime(date) >= stripTime(start);
 
       function App(){
-        // Data
+        const [view, setView] = useState("log"); // "log" | "goals"
+
         const [items, setItems]   = useState(() => load("items", []));
         const [saved, setSaved]   = useState(() => load("saved", []));
-        const [goals, setGoals]   = useState(() => load("goals", []));
-        // UI
-        const [view, setView]     = useState("log");   // log | goals | insights | history | categories | settings | about | feedback
-        const [tab, setTab]       = useState("week");  // week | month | year | all
+        const [newName, setNewName] = useState("");
+        const [newPrice, setNewPrice] = useState("");
+        const [tab, setTab] = useState("week"); // week | month | year | all
 
-        // Uncontrolled inputs (iOS-stabilt)
-        const nameRef  = useRef(null);
-        const priceRef = useRef(null);
+        // Goals
+        const [goals, setGoals] = useState(() => load("goals", []));
+        const [gName, setGName] = useState("");
+        const [gTarget, setGTarget] = useState("");
+        const [gChecked, setGChecked] = useState({}); // itemId -> bool
+        const [depVals, setDepVals] = useState({}); // goalId -> input value
 
         useEffect(() => save("items", items), [items]);
         useEffect(() => save("saved", saved), [saved]);
         useEffect(() => save("goals", goals), [goals]);
 
-        /* Drawer – CSS toggle (ingen unmount/remount av inputs) */
-        useEffect(() => {
-          const drawer = document.getElementById("drawer");
-          const btn = document.getElementById("menuBtn");
-          const open  = () => drawer.classList.add("open");
-          const close = (e) => { if(e.target === drawer) drawer.classList.remove("open"); };
-          btn.addEventListener("click", open);
-          drawer.addEventListener("click", close);
-          return () => { btn.removeEventListener("click", open); drawer.removeEventListener("click", close); };
-        }, []);
-
-        /* Items / Saved */
         const addItem = () => {
-          const name = (nameRef.current?.value || "").trim();
-          const raw  = (priceRef.current?.value || "").replace(",", ".").trim();
-          const price = Number(raw);
-          if(!name || !raw){ alert("Fyll i både namn och pris"); return; }
+          if(!newName.trim() || !newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
+          const price = Number(newPrice.replace(",", "."));
           if(Number.isNaN(price) || price <= 0){ alert("Ange ett giltigt pris"); return; }
-          setItems(prev => [...prev, { id: String(Date.now()), name, price }]);
-          if (nameRef.current)  { nameRef.current.value = ""; nameRef.current.focus(); }
-          if (priceRef.current) { priceRef.current.value = ""; }
+          setItems(prev => [...prev, { id: String(Date.now()), name: newName.trim(), price }]);
+          setNewName(""); setNewPrice("");
         };
         const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
 
+        // När man "avstod" — logga + fyll länkade mål
         const saveMoney  = (item) => {
           const entry = { ...item, sid:String(Date.now()), date:new Date().toISOString() };
           setSaved(prev => [entry, ...prev]);
-          // kreditera länkade mål
           setGoals(prev => prev.map(g => (
             (g.itemIds||[]).includes(item.id)
-              ? { ...g, amount:(g.amount||0)+(+item.price||0),
+              ? { ...g,
+                  amount:(g.amount||0) + (+item.price||0),
                   deposits:[...(g.deposits||[]), {date:entry.date, amount:+item.price, source:item.name}] }
               : g
           )));
@@ -226,52 +223,42 @@
         const deleteSaved= (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
         const clearHistory = () => { if(confirm("Rensa hela historiken?")) setSaved([]); };
 
-        /* Period / summering */
+        // Filterad historik per flik
         const today = new Date();
         const periodStart = useMemo(() => {
           if(tab === "week")  return startOfWeek(today);
           if(tab === "month") return startOfMonth(today);
           if(tab === "year")  return startOfYear(today);
-          return new Date(0);
+          return new Date(0); // all
         }, [tab]);
 
         const filtered = useMemo(() => saved.filter(s => isInRange(toDate(s.date), periodStart)), [saved, periodStart]);
-        const totalSavedAll   = useMemo(() => saved.reduce((a,s)=>a+(+s.price||0), 0), [saved]);
-        const totalSavedPeriod= useMemo(() => filtered.reduce((a,s)=>a+(+s.price||0), 0), [filtered]);
 
-        const bars = useMemo(() => {
-          const map = new Map();
-          for(const s of filtered){
-            const key = stripTime(toDate(s.date)).toISOString();
-            map.set(key, (map.get(key)||0) + (+s.price||0));
-          }
-          const arr = Array.from(map.entries()).sort((a,b)=> new Date(a[0])-new Date(b[0]));
-          const values = arr.map(x=>x[1]);
-          const max = Math.max(...values, 1);
-          return arr.map(([k,v]) => ({ date:new Date(k), h: Math.max(6, Math.round(60*v/max)) }));
-        }, [filtered]);
+        // Summeringar
+        const totalSavedAll   = useMemo(() => saved.reduce((a,s)=>a+(+s.price||0),0), [saved]);
+        const totalSavedPeriod= useMemo(() => filtered.reduce((a,s)=>a+(+s.price||0),0), [filtered]);
+
         const tabLabel = { week:"Vecka", month:"Månad", year:"År", all:"Alla" }[tab];
 
-        /* Goals */
-        const [gName, setGName] = useState("");
-        const [gTarget, setGTarget] = useState("");
-        const [gChecked, setGChecked] = useState({});
+        // ------- SPARMÅL -------
+        const resetGoalForm = () => { setGName(""); setGTarget(""); setGChecked({}); };
         const createGoal = () => {
-          const name = gName.trim();
-          const target = Number((gTarget||"").replace(",", "."));
-          if(!name || !target){ alert("Fyll i namn och målbelopp"); return; }
+          if(!gName.trim() || !gTarget.trim()){ alert("Fyll i namn och målbelopp"); return; }
+          const target = Number(gTarget.replace(",", "."));
           if(Number.isNaN(target) || target <= 0){ alert("Ange ett giltigt målbelopp"); return; }
           const itemIds = Object.entries(gChecked).filter(([,v])=>v).map(([k])=>k);
-          const goal = { id:String(Date.now()), name, target, amount:0, itemIds, deposits:[] };
+          const goal = { id:String(Date.now()), name:gName.trim(), target, amount:0, itemIds, deposits:[] };
           setGoals(prev => [goal, ...prev]);
-          setGName(""); setGTarget(""); setGChecked({});
+          resetGoalForm();
         };
         const removeGoal = (id) => { if(confirm("Ta bort det här målet?")) setGoals(prev => prev.filter(g => g.id !== id)); };
-        const addDeposit = (id, amount) => {
-          const num = Number(String(amount).replace(",", "."));
+        const addDeposit = (id) => {
+          const raw = depVals[id] ?? "";
+          const num = Number(String(raw).replace(",", "."));
           if(Number.isNaN(num) || num <= 0){ alert("Ogiltigt belopp"); return; }
           const date = new Date().toISOString();
           setGoals(prev => prev.map(g => g.id === id ? { ...g, amount:(g.amount||0)+num, deposits:[...(g.deposits||[]), {date, amount:num, source:"Manuell"}] } : g));
+          setDepVals(v => ({...v, [id]:""}));
         };
         const toggleLink = (goalId, itemId, checked) => {
           setGoals(prev => prev.map(g => {
@@ -282,27 +269,13 @@
           }));
         };
 
-        /* ===== Views ===== */
+        // ------- VYER -------
         const LogView = () => (
           <>
             <div className="row">
-              <input
-                ref={nameRef}
-                type="text"
-                placeholder="Namn (t.ex. Latte)"
-                autoComplete="off" autoCorrect="off" autoCapitalize="none" inputMode="text"
-              />
-              <input
-                ref={priceRef}
-                type="text"                /* iOS: undvik number-quirks */
-                placeholder="Pris"
-                inputMode="decimal" pattern="[0-9]*[.,]?[0-9]*" autoComplete="off"
-              />
-              <button
-                className="btn btn-add" type="button"
-                onMouseDown={(e)=>e.preventDefault()}   /* behåll fokus => keyboard stannar */
-                onClick={addItem}
-              >Lägg till</button>
+              <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
+              <input type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
+              <button className="btn btn-add" onClick={addItem}>Lägg till</button>
             </div>
 
             {items.length === 0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
@@ -312,8 +285,8 @@
                   <div className="list-item" key={item.id}>
                     <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
                     <div className="actions">
-                      <button className="btn save"   type="button" onClick={()=>saveMoney(item)}>Avstod</button>
-                      <button className="btn danger" type="button" onClick={()=>removeItem(item.id)}>Ta bort</button>
+                      <button className="btn save" onClick={()=>saveMoney(item)}>Avstod</button>
+                      <button className="btn danger" onClick={()=>removeItem(item.id)}>Ta bort</button>
                     </div>
                   </div>
                 ))}
@@ -323,7 +296,7 @@
             <div className="section"><h3>Översikt</h3></div>
             <div className="tabs">
               {["week","month","year","all"].map(key => (
-                <button key={key} type="button" className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
+                <button key={key} className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
                   {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
                 </button>
               ))}
@@ -344,20 +317,9 @@
               </div>
             </div>
 
-            {filtered.length > 0 && (
-              <div className="card" style={{padding:"6px 8px"}}>
-                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Logg för {tabLabel.toLowerCase()}</div>
-                <div className="bars">
-                  {bars.map((b, i) => (
-                    <div key={i} className="bar" style={{height:b.h+'px'}} title={b.date.toLocaleDateString()}></div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="section">
               <h3>Historik – {tabLabel.toLowerCase()}</h3>
-              {saved.length > 0 && <button className="btn danger" type="button" onClick={clearHistory}>Rensa all historik</button>}
+              {saved.length > 0 && <button className="btn danger" onClick={clearHistory}>Rensa all historik</button>}
             </div>
 
             {filtered.length === 0 && <div className="empty">Du har inte avstått något i vald period.</div>}
@@ -368,7 +330,7 @@
                     <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
                     <div className="actions">
                       <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
-                      <button className="btn danger" type="button" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
+                      <button className="btn danger" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
                     </div>
                   </div>
                 ))}
@@ -379,168 +341,108 @@
           </>
         );
 
-const GoalsView = () => {
-  const [depInputs, setDepInputs] = React.useState({}); // goalId -> string
-  const setDep = (id, v) => setDepInputs(s => ({ ...s, [id]: v || "" }));
-  const commitDep = (id) => { addDeposit(id, depInputs[id] || ""); setDep(id, ""); };
-
-  return (
-    <>
-      {/* Skapa mål */}
-      <div className="card" style={{ padding: "14px" }}>
-        <div className="row" style={{ gridTemplateColumns: "1fr 160px auto" }}>
-          <input
-            type="text"
-            placeholder="Namn på mål (t.ex. Resa)"
-            value={gName}
-            onChange={e => setGName(e.target.value)}
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Målsumma (kr)"
-            value={gTarget}
-            onChange={e => setGTarget(e.target.value)}
-          />
-          <button className="btn btn-add" type="button" onClick={createGoal}>
-            Skapa mål
-          </button>
-        </div>
-
-        <div className="muted" style={{ marginTop: 6 }}>
-          Välj vilka impulsköp som ska kopplas till detta mål:
-        </div>
-        <div className="chips">
-          {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
-          {items.map(i => (
-            <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={!!gChecked[i.id]}
-                onChange={e => setGChecked(s => ({ ...s, [i.id]: e.target.checked }))}
-                style={{ marginRight: 8 }}
-              />
-              {i.name} ({i.price} kr)
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Lista mål */}
-      {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
-      {goals.map(goal => {
-        const pct = Math.min(100, Math.round(((goal.amount || 0) / (goal.target || 1)) * 100));
-        return (
-          <div key={goal.id} className="card" style={{ padding: "14px", marginTop: "12px" }}>
-            <div className="list-item" style={{ borderBottom: "0", padding: "0", marginBottom: "10px" }}>
-              <div>
-                <strong>{goal.name}</strong>
-                <div className="muted">
-                  Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount || 0).toFixed(2)} kr ({pct}%)
-                </div>
+        const GoalsView = () => (
+          <>
+            {/* Skapa mål */}
+            <div className="card" style={{padding:"14px"}}>
+              <div className="row" style={{gridTemplateColumns:"1fr 160px auto"}}>
+                <input
+                  type="text"
+                  placeholder="Namn på mål (t.ex. Resa)"
+                  value={gName}
+                  onChange={e=>setGName(e.target.value)}
+                  autoComplete="off"
+                  autoCapitalize="sentences"
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Målsumma (kr)"
+                  value={gTarget}
+                  onChange={e=>setGTarget(e.target.value)}
+                  inputMode="decimal"
+                />
+                <button className="btn btn-add" type="button" onClick={createGoal}>Skapa mål</button>
               </div>
-              <button className="btn danger" type="button" onClick={() => removeGoal(goal.id)}>
-                Ta bort
-              </button>
-            </div>
 
-            {/* Progress */}
-            <div className="progress" style={{ height: "10px", borderRadius: "999px", background: "#eef2f7", overflow: "hidden", margin: "10px 0 8px" }}>
-              <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }} />
-            </div>
-
-            {/* Kopplade items */}
-            <div className="muted">Kopplade impulsköp</div>
-            <div className="chips">
-              {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
-              {items.map(i => {
-                const checked = !!(goal.itemIds || []).includes(i.id);
-                return (
-                  <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
+              <div className="muted" style={{marginTop:6}}>Välj vilka impulsköp som ska kopplas till detta mål:</div>
+              <div className="chips" style={{marginTop:"8px"}}>
+                {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
+                {items.map(i => (
+                  <label key={i.id} className="chip">
                     <input
                       type="checkbox"
-                      checked={checked}
-                      onChange={e => toggleLink(goal.id, i.id, e.target.checked)}
-                      style={{ marginRight: 8 }}
+                      checked={!!gChecked[i.id]}
+                      onChange={e=>setGChecked(s=>({...s, [i.id]:e.target.checked}))}
+                      style={{marginRight:8}}
                     />
                     {i.name} ({i.price} kr)
                   </label>
-                );
-              })}
+                ))}
+              </div>
             </div>
 
-            {/* Insättning */}
-            <div style={{ display: "flex", gap: 8, width: "100%", marginTop: 8 }}>
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Insättning (kr)"
-                value={depInputs[goal.id] || ""}
-                onChange={e => setDep(goal.id, e.target.value)}
-              />
-              <button
-                className="btn"
-                type="button"
-                onMouseDown={e => e.preventDefault()}   // iOS: behåll keyboard fokus
-                onClick={() => commitDep(goal.id)}
-              >
-                Lägg till insättning
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
+            {/* Lista mål */}
+            {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
+            {goals.map(goal => {
+              const pct = Math.min(100, Math.round((goal.amount||0) / (goal.target||1) * 100));
+              const depVal = depVals[goal.id] ?? "";
+              return (
+                <div key={goal.id} className="goal-card">
+                  <div className="goal-head">
+                    <div>
+                      <strong>{goal.name}</strong>
+                      <div className="muted">Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount||0).toFixed(2)} kr ({pct}%)</div>
+                    </div>
+                    <button className="btn danger" type="button" onClick={()=>removeGoal(goal.id)}>Ta bort</button>
+                  </div>
 
+                  <div className="progress" style={{margin:"10px 0 8px"}}>
+                    <div style={{width:pct+"%"}}></div>
+                  </div>
 
-        /* Övriga sidor – placeholders */
-        const SimpleCard = ({title, text}) => (
-          <div className="card" style={{padding:"16px"}}>
-            <h3 style={{margin:"0 0 8px"}}>{title}</h3>
-            <div className="muted">{text}</div>
-          </div>
-        );
+                  <div className="muted">Kopplade impulsköp</div>
+                  <div className="chips" style={{marginTop:"6px"}}>
+                    {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
+                    {items.map(i => {
+                      const checked = !!(goal.itemIds||[]).includes(i.id);
+                      return (
+                        <label key={i.id} className="chip">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e)=>toggleLink(goal.id, i.id, e.target.checked)}
+                            style={{marginRight:8}}
+                          />
+                          {i.name} ({i.price} kr)
+                        </label>
+                      );
+                    })}
+                  </div>
 
-        const InsightsView   = () => <SimpleCard title="Insikter"   text="Här kan vi visa diagram, bästa avståenden, trender m.m." />;
-        const HistoryPage    = () => <SimpleCard title="Historik"    text="Separat historik med sök/filtrering kan hamna här." />;
-        const CategoriesView = () => <SimpleCard title="Kategorier"  text="Lägg till/hantera kategorier och koppla impulsköp till dem." />;
-        const SettingsView   = () => <SimpleCard title="Inställningar" text="Tema, notiser och export/import (kommer senare)." />;
-        const AboutView      = () => <SimpleCard title="Om" text="Saved it – logga avståenden och spara pengar. Allt lagras lokalt." />;
-        const FeedbackView   = () => (
-          <div className="card" style={{padding:"16px"}}>
-            <h3 style={{margin:"0 0 8px"}}>Feedback</h3>
-            <div className="muted">Maila gärna idéer och förslag: <a href={`mailto:${FEEDBACK_EMAIL}`}>{FEEDBACK_EMAIL}</a></div>
-          </div>
+                  <div style={{display:"flex", gap:"8px", width:"100%", marginTop:"10px"}}>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Insättning (kr)"
+                      value={depVal}
+                      onChange={(e)=>setDepVals(v=>({...v, [goal.id]: e.target.value}))}
+                      inputMode="decimal"
+                    />
+                    <button className="btn" type="button" onClick={()=>addDeposit(goal.id)}>Lägg till insättning</button>
+                  </div>
+                </div>
+              );
+            })}
+          </>
         );
 
         return (
           <>
-            {view === "log"        && <LogView />}
-            {view === "goals"      && <GoalsView />}
-            {view === "insights"   && <InsightsView />}
-            {view === "history"    && <HistoryPage />}
-            {view === "categories" && <CategoriesView />}
-            {view === "settings"   && <SettingsView />}
-            {view === "about"      && <AboutView />}
-            {view === "feedback"   && <FeedbackView />}
-
-            <Drawer current={view} onChange={setView} />
+            {view === "log"   && <LogView />}
+            {view === "goals" && <GoalsView />}
           </>
         );
-      }
-
-      function Drawer({current, onChange}){
-        useEffect(() => {
-          const drawer = document.getElementById("drawer");
-          const buttons = drawer.querySelectorAll('.nav-btn');
-          buttons.forEach(b => {
-            b.classList.toggle('active', b.dataset.view === current);
-            b.onclick = () => { onChange(b.dataset.view); drawer.classList.remove("open"); };
-          });
-        }, [current, onChange]);
-        return null;
       }
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -552,25 +454,43 @@ const GoalsView = () => {
         e.preventDefault();
         deferredPrompt = e;
         const btn = document.getElementById('installBtn');
-        if(btn){
-          btn.hidden = false;
-          btn.onclick = async () => {
-            btn.disabled = true;
-            await deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-            btn.hidden = true;
-            deferredPrompt = null;
-          };
-        }
+        btn.hidden = false;
+        btn.onclick = async () => {
+          btn.disabled = true;
+          await deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          btn.hidden = true;
+          deferredPrompt = null;
+        };
       });
 
-      // Service worker (frivilligt)
+      // Service worker
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+          navigator.serviceWorker.register('./service-worker.js');
         });
       }
+
+      // Flikväxling (utanför React: enkel och snabb)
+      const tabLog = document.getElementById('tab-log');
+      const tabGoals = document.getElementById('tab-goals');
+      // Vi manipulerar React-rot genom att dispatcha en CustomEvent till fönstret
+      // och gör minimal “signalering” så UI uppdateras utan att blanda DOM/React för mycket.
+      let currentView = "log";
+      function setActive(view){
+        currentView = view;
+        tabLog.classList.toggle('active', view==="log");
+        tabGoals.classList.toggle('active', view==="goals");
+        // Quick re-render: vi mountar om App med prop via global flagga
+        // (snabb workaround utan extra router – funkar fint för 2 vyer)
+        window.__setView = view;
+        rerender();
+      }
+      function rerender(){
+        root.render(<App key={window.__setView} />);
+      }
+      tabLog.addEventListener('click', ()=>setActive("log"));
+      tabGoals.addEventListener('click', ()=>setActive("goals"));
     </script>
   </body>
 </html>
-
