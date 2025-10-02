@@ -2,15 +2,17 @@
 <html lang="sv">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    />
     <title>Saved it</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.webmanifest" />
     <meta name="theme-color" content="#0ea5e9" />
     <link rel="icon" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=12"/>
-
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=12" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
@@ -61,13 +63,14 @@
       /* Inputs */
       .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
       @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
-      input[type="text"], input[type="number"], select, textarea{
+      input[type="text"], input[type="number"]{
         width:100%; padding: 12px 14px; border:1px solid var(--border); border-radius: 12px; background:#fff;
         font-size:17px !important; color:var(--text); caret-color:var(--text);
         outline:none; transition: border-color .15s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.03);
+        -webkit-appearance: none; appearance: none;
       }
-      input::placeholder, textarea::placeholder{ color:#9aa0a6; opacity:1; }
-      input:focus, select:focus, textarea:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+      input::placeholder{ color:#9aa0a6; opacity:1; }
+      input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
       input:-webkit-autofill{ -webkit-text-fill-color: var(--text) !important; box-shadow: 0 0 0 1000px #fff inset; -webkit-box-shadow: 0 0 0 1000px #fff inset; }
 
       .btn{ padding: 11px 14px; border-radius: 12px; border:1px solid var(--border); background:#fff; color:var(--text); cursor:pointer; font-weight:600; transition: transform .06s, box-shadow .15s; box-shadow: 0 1px 0 rgba(15,23,42,.05); width:auto; }
@@ -102,8 +105,11 @@
       .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
       .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
 
-      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); position: static !important; }
+      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
       .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
+
+      /* iOS keyboard fix: deaktivera sticky när tangentbordet är uppe */
+      .kb-open .stats { position: static !important; }
 
       /* Drawer */
       .drawer{ position:fixed; inset:0; background:rgba(2,6,23,.28); display:none; }
@@ -124,15 +130,6 @@
       .chips{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;}
       .chip{ padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff; font-size:12px; }
       .goal-actions{ display:flex; gap:8px; margin-top:10px;}
-      
-      /* Simple table list */
-      .table{ width:100%; border-collapse: collapse; }
-      .table tr{ border-bottom:1px solid var(--border); }
-      .table td{ padding:10px 0; }
-      .right{ text-align:right; }
-      .row-sm{ display:flex; gap:8px; }
-      .note{ font-size:12px; color:var(--muted);}
-      .pill{ padding:4px 8px; border-radius:999px; background:#eef2f7; border:1px solid var(--border); font-size:12px; }
     </style>
   </head>
 
@@ -161,12 +158,7 @@
         <h4>Meny</h4>
         <button class="nav-btn" data-view="log">Logg & översikt</button>
         <button class="nav-btn" data-view="goals">Sparmål</button>
-        <button class="nav-btn" data-view="insights">Insikter</button>
-        <button class="nav-btn" data-view="history">Historik</button>
-        <button class="nav-btn" data-view="categories">Kategorier</button>
-        <button class="nav-btn" data-view="settings">Inställningar</button>
-        <button class="nav-btn" data-view="about">Om</button>
-        <button class="nav-btn" data-view="feedback">Feedback</button>
+        <!-- plats för fler sidor (Insikter/Inställningar/etc) när vi vill -->
       </div>
     </div>
 
@@ -176,15 +168,19 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-      const FEEDBACK_EMAIL = "din@epost.se"; // <-- BYT TILL DIN ADRESS
+      /* =============== Globala konstanter / helpers =============== */
 
-      const { useState, useEffect, useMemo } = React;
+      const FEEDBACK_EMAIL = "din@epost.se"; // byt om du vill använda i en Feedback-sida
+      const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-      // Helpers
+      const isIOS = () =>
+        /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
+      // Storage helpers
       const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
       const saveLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-      // Dates
+      // Date helpers
       const toDate = (iso) => new Date(iso);
       const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
@@ -192,8 +188,38 @@
       const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
       const isInRange = (date, start) => stripTime(date) >= stripTime(start);
 
+      /* =============== SafeInput: motverkar iOS-blur =============== */
+      function SafeInput(props){
+        const ref = useRef(null);
+        const lastType = useRef(0);
+
+        useEffect(() => {
+          const el = ref.current;
+          if(!el) return;
+
+          const onInput = () => { lastType.current = Date.now(); };
+          const onBlur = (e) => {
+            // Om iOS råkar “blura” direkt efter input, refokusera mjukt
+            if (isIOS() && Date.now() - lastType.current < 180) {
+              e.preventDefault();
+              setTimeout(() => {
+                try { el.focus({ preventScroll: true }); } catch {}
+              }, 0);
+            }
+          };
+          el.addEventListener('input', onInput);
+          el.addEventListener('blur', onBlur);
+          return () => {
+            el.removeEventListener('input', onInput);
+            el.removeEventListener('blur', onBlur);
+          };
+        }, []);
+
+        return <input ref={ref} {...props} />;
+      }
+
+      /* =========================== App ============================ */
       function App(){
-        // Core data
         const [items, setItems]   = useState(() => load("items", []));
         const [saved, setSaved]   = useState(() => load("saved", []));
         const [newName, setNewName] = useState("");
@@ -201,59 +227,54 @@
         const [tab, setTab] = useState("week"); // week | month | year | all
 
         // Goals
+        // goal: {id,name,target,amount,itemIds:[], deposits:[]}
         const [goals, setGoals] = useState(() => load("goals", []));
-        // Categories
-        const [categories, setCategories] = useState(() => load("categories", []));
-        // Settings
-        const [settings, setSettings] = useState(() => load("settings", { currency:"kr", weekStartsOn:"monday", notifications:{weeklySummary:{enabled:false, day:0, time:"18:00"}} }));
-
-        // View
-        const [view, setView] = useState("log"); // log | goals | insights | history | categories | settings | about | feedback
-
-        // Stäng av sticky-footer när ett inputfält är fokus (iOS/Safari)
-useEffect(() => {
-  const onFocusIn = (e) => {
-    const t = e.target && e.target.tagName;
-    if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
-      document.body.classList.add('kb-open');
-    }
-  };
-  const onFocusOut = (e) => {
-    const t = e.target && e.target.tagName;
-    if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
-      document.body.classList.remove('kb-open');
-    }
-  };
-  window.addEventListener('focusin', onFocusIn);
-  window.addEventListener('focusout', onFocusOut);
-  return () => {
-    window.removeEventListener('focusin', onFocusIn);
-    window.removeEventListener('focusout', onFocusOut);
-  };
-}, []);
+        const [view, setView] = useState("log"); // "log" | "goals"
 
         useEffect(()=>saveLS("items", items), [items]);
         useEffect(()=>saveLS("saved", saved), [saved]);
         useEffect(()=>saveLS("goals", goals), [goals]);
-        useEffect(()=>saveLS("categories", categories), [categories]);
-        useEffect(()=>saveLS("settings", settings), [settings]);
 
-        // ------- items / saved -------
+        /* ----- iOS keyboard body-klass ----- */
+        useEffect(() => {
+          const onFocusIn = (e) => {
+            const t = e.target && e.target.tagName;
+            if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
+              document.body.classList.add('kb-open');
+            }
+          };
+          const onFocusOut = (e) => {
+            const t = e.target && e.target.tagName;
+            if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
+              document.body.classList.remove('kb-open');
+            }
+          };
+          window.addEventListener('focusin', onFocusIn);
+          window.addEventListener('focusout', onFocusOut);
+          return () => {
+            window.removeEventListener('focusin', onFocusIn);
+            window.removeEventListener('focusout', onFocusOut);
+          };
+        }, []);
+
+        /* ----- Items / Saved ----- */
         const addItem = () => {
           if(!newName.trim() || !newPrice.trim()){ alert("Fyll i både namn och pris"); return; }
-          const price = Number(newPrice.replace(",", ".")); if(Number.isNaN(price) || price <= 0){ alert("Ange ett giltigt pris"); return; }
-          setItems(prev => [...prev, { id: String(Date.now()), name: newName.trim(), price, categoryId:null }]);
+          const price = Number(newPrice.replace(",", "."));
+          if(Number.isNaN(price) || price <= 0){ alert("Ange ett giltigt pris"); return; }
+          setItems(prev => [...prev, { id: String(Date.now()), name: newName.trim(), price }]);
           setNewName(""); setNewPrice("");
         };
         const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
 
-        // When saving money we also update linked goals
         const saveMoney  = (item) => {
           const entry = { ...item, sid:String(Date.now()), date:new Date().toISOString() };
           setSaved(prev => [entry, ...prev]);
+          // uppdatera mål som är kopplade till item.id
           setGoals(prev => prev.map(g => (
-            g.itemIds?.includes(item.id)
-              ? { ...g, amount: (g.amount||0) + (Number(item.price)||0),
+            (g.itemIds||[]).includes(item.id)
+              ? { ...g,
+                  amount: (g.amount||0) + (+item.price||0),
                   deposits:[...(g.deposits||[]), {date:entry.date, amount:+item.price, source:item.name}] }
               : g
           )));
@@ -261,7 +282,7 @@ useEffect(() => {
         const deleteSaved= (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
         const clearHistory = () => { if(confirm("Rensa hela historiken?")) setSaved([]); };
 
-        // ------- filters / summaries -------
+        /* ----- Filter & summering ----- */
         const today = new Date();
         const periodStart = useMemo(() => {
           if(tab === "week")  return startOfWeek(today);
@@ -288,13 +309,49 @@ useEffect(() => {
 
         const tabLabel = { week:"Vecka", month:"Månad", year:"År", all:"Alla" }[tab];
 
-        /* --------- VIEWS ---------- */
+        /* ----- Goals ----- */
+        const [gName, setGName] = useState("");
+        const [gTarget, setGTarget] = useState("");
+        const [gChecked, setGChecked] = useState({}); // itemId -> bool
+        const resetGoalForm = () => { setGName(""); setGTarget(""); setGChecked({}); };
 
+        const createGoal = () => {
+          if(!gName.trim() || !gTarget.trim()){ alert("Fyll i namn och målbelopp"); return; }
+          const target = Number(gTarget.replace(",", "."));
+          if(Number.isNaN(target) || target <= 0){ alert("Ange ett giltigt målbelopp"); return; }
+          const itemIds = Object.entries(gChecked).filter(([,v])=>v).map(([k])=>k);
+          const goal = { id:String(Date.now()), name:gName.trim(), target, amount:0, itemIds, deposits:[] };
+          setGoals(prev => [goal, ...prev]);
+          resetGoalForm();
+        };
+
+        const removeGoal = (id) => {
+          if(!confirm("Ta bort det här målet?")) return;
+          setGoals(prev => prev.filter(g => g.id !== id));
+        };
+
+        const addDeposit = (id, amount) => {
+          const num = Number(String(amount).replace(",", "."));
+          if(Number.isNaN(num) || num <= 0){ alert("Ogiltigt belopp"); return; }
+          const date = new Date().toISOString();
+          setGoals(prev => prev.map(g => g.id === id ? { ...g, amount:(g.amount||0)+num, deposits:[...(g.deposits||[]), {date, amount:num, source:"Manuell"}] } : g));
+        };
+
+        const toggleLink = (goalId, itemId, checked) => {
+          setGoals(prev => prev.map(g => {
+            if(g.id !== goalId) return g;
+            const set = new Set(g.itemIds || []);
+            if(checked) set.add(itemId); else set.delete(itemId);
+            return { ...g, itemIds:[...set] };
+          }));
+        };
+
+        /* ----- Views ----- */
         const LogView = () => (
           <>
             <div className="row">
-              <input type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
-              <input type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
+              <SafeInput type="text" placeholder="Namn (t.ex. Latte)" value={newName} onChange={e=>setNewName(e.target.value)} />
+              <SafeInput type="number" step="0.01" placeholder="Pris" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
               <button className="btn btn-add" onClick={addItem}>Lägg till</button>
             </div>
 
@@ -303,10 +360,7 @@ useEffect(() => {
               <div className="card">
                 {items.map(item => (
                   <div className="list-item" key={item.id}>
-                    <div>
-                      <strong>{item.name}</strong> <span className="muted">({item.price} {settings.currency})</span>
-                      {item.categoryId && <span className="pill" style={{marginLeft:8}}>{categories.find(c=>c.id===item.categoryId)?.emoji || ""} {categories.find(c=>c.id===item.categoryId)?.name || ""}</span>}
-                    </div>
+                    <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
                     <div className="actions">
                       <button className="btn save" onClick={()=>saveMoney(item)}>Avstod</button>
                       <button className="btn danger" onClick={()=>removeItem(item.id)}>Ta bort</button>
@@ -328,7 +382,7 @@ useEffect(() => {
             <div className="summary">
               <div className="sum-card">
                 <div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div>
-                <div className="sum-value">{totalSavedPeriod.toFixed(2)} {settings.currency}</div>
+                <div className="sum-value">{totalSavedPeriod.toFixed(2)} kr</div>
               </div>
               <div className="sum-card">
                 <div className="sum-label">Antal avståenden</div>
@@ -336,7 +390,7 @@ useEffect(() => {
               </div>
               <div className="sum-card">
                 <div className="sum-label">Totalt (alla tider)</div>
-                <div className="sum-value">{totalSavedAll.toFixed(2)} {settings.currency}</div>
+                <div className="sum-value">{totalSavedAll.toFixed(2)} kr</div>
               </div>
             </div>
 
@@ -361,7 +415,7 @@ useEffect(() => {
               <div className="card">
                 {filtered.slice(0,100).map(s => (
                   <div className="list-item" key={s.sid}>
-                    <div><strong>{s.name}</strong> <span className="muted">{s.price} {settings.currency}</span></div>
+                    <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
                     <div className="actions">
                       <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
                       <button className="btn danger" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
@@ -371,374 +425,97 @@ useEffect(() => {
               </div>
             )}
 
-            <div className="stats"><b>Totalt sparat: {totalSavedAll.toFixed(2)} {settings.currency}</b></div>
+            <div className="stats"><b>Totalt sparat: {totalSavedAll.toFixed(2)} kr</b></div>
           </>
         );
 
-        /* ------------ GOALS ------------ */
-        const [gName, setGName] = useState("");
-        const [gTarget, setGTarget] = useState("");
-        const [gChecked, setGChecked] = useState({}); // itemId -> bool
-        const resetGoalForm = () => { setGName(""); setGTarget(""); setGChecked({}); };
-
-        const createGoal = () => {
-          if(!gName.trim() || !gTarget.trim()){ alert("Fyll i namn och målbelopp"); return; }
-          const target = Number(gTarget.replace(",", ".")); if(Number.isNaN(target) || target <= 0){ alert("Ange ett giltigt målbelopp"); return; }
-          const itemIds = Object.entries(gChecked).filter(([,v])=>v).map(([k])=>k);
-          const goal = { id:String(Date.now()), name:gName.trim(), target, amount:0, itemIds, deposits:[] };
-          setGoals(prev => [goal, ...prev]); resetGoalForm();
-        };
-        const removeGoal = (id) => { if(confirm("Ta bort det här målet?")) setGoals(prev => prev.filter(g => g.id !== id)); };
-        const addDeposit = (id, amount) => {
-          const num = Number(String(amount).replace(",", ".")); if(Number.isNaN(num) || num <= 0){ alert("Ogiltigt belopp"); return; }
-          const date = new Date().toISOString();
-          setGoals(prev => prev.map(g => g.id === id ? { ...g, amount:(g.amount||0)+num, deposits:[...(g.deposits||[]), {date, amount:num, source:"Manuell"}] } : g));
-        };
-        const toggleLink = (goalId, itemId, checked) => {
-          setGoals(prev => prev.map(g => {
-            if(g.id !== goalId) return g;
-            const set = new Set(g.itemIds || []);
-            if(checked) set.add(itemId); else set.delete(itemId);
-            return { ...g, itemIds:[...set] };
-          }));
-        };
-        const GoalDepositInput = ({onAdd}) => {
-          const [val, setVal] = useState("");
-          return (
-            <div className="row-sm">
-              <input type="number" step="0.01" placeholder="Insättning (kr)" value={val} onChange={e=>setVal(e.target.value)} />
-              <button className="btn" onClick={()=>{ onAdd(val); setVal(""); }}>Lägg till insättning</button>
-            </div>
-          );
-        };
-
-        const GoalsView = () => (
-          <>
-            <div className="card" style={{padding:"14px"}}>
-              <div className="goal-form">
-                <input type="text" placeholder="Namn på mål (t.ex. Resa)" value={gName} onChange={e=>setGName(e.target.value)} />
-                <input type="number" step="0.01" placeholder={`Målsumma (${settings.currency})`} value={gTarget} onChange={e=>setGTarget(e.target.value)} />
-                <button className="btn btn-add" onClick={createGoal}>Skapa mål</button>
-              </div>
-              <div className="muted" style={{marginTop:6}}>Välj vilka impulsköp som ska kopplas till detta mål:</div>
-              <div className="chips">
-                {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
-                {items.map(i => (
-                  <label key={i.id} className="chip" style={{cursor:"pointer"}}>
-                    <input type="checkbox" checked={!!gChecked[i.id]} onChange={e=>setGChecked(s=>({...s, [i.id]:e.target.checked}))} style={{marginRight:8}} />
-                    {i.name} ({i.price} {settings.currency})
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
-            {goals.map(goal => {
-              const pct = Math.min(100, Math.round((goal.amount||0) / (goal.target||1) * 100));
-              return (
-                <div key={goal.id} className="goal-card">
-                  <div className="goal-head">
-                    <div>
-                      <strong>{goal.name}</strong>
-                      <div className="muted">Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} {settings.currency} · Sparat: {(goal.amount||0).toFixed(2)} {settings.currency} ({pct}%)</div>
-                    </div>
-                    <button className="btn danger" onClick={()=>removeGoal(goal.id)}>Ta bort</button>
-                  </div>
-                  <div className="progress" style={{margin:"10px 0 8px"}}><div style={{width:pct+"%"}}></div></div>
-
-                  <div className="muted">Kopplade impulsköp</div>
-                  <div className="chips">
-                    {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
-                    {items.map(i => {
-                      const checked = !!(goal.itemIds||[]).includes(i.id);
-                      return (
-                        <label key={i.id} className="chip" style={{cursor:"pointer"}}>
-                          <input type="checkbox" checked={checked} onChange={(e)=>toggleLink(goal.id, i.id, e.target.checked)} style={{marginRight:8}}/>
-                          {i.name} ({i.price} {settings.currency})
-                        </label>
-                      );
-                    })}
-                  </div>
-
-                  <div className="goal-actions"><GoalDepositInput onAdd={amt=>addDeposit(goal.id, amt)} /></div>
-                </div>
-              );
-            })}
-          </>
-        );
-
-        /* ---------- INSIGHTS ---------- */
-        const InsightsView = () => {
-          const byItem = useMemo(() => {
-            const map = new Map();
-            for(const r of saved){ map.set(r.name, (map.get(r.name)||0)+(+r.price||0)); }
-            return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5);
-          }, [saved]);
-
-          const weekSaved = saved.filter(s=>isInRange(toDate(s.date), startOfWeek(today))).reduce((a,s)=>a+(+s.price||0),0);
-          const monthSaved = saved.filter(s=>isInRange(toDate(s.date), startOfMonth(today))).reduce((a,s)=>a+(+s.price||0),0);
-          const yearSaved = saved.filter(s=>isInRange(toDate(s.date), startOfYear(today))).reduce((a,s)=>a+(+s.price||0),0);
-
-          const barsAll = useMemo(() => {
-            // 14 senaste dagarna
-            const now = stripTime(today);
-            const days = [...Array(14)].map((_,i)=> new Date(now.getTime() - (13-i)*86400000));
-            const arr = days.map(d=>{
-              const tot = saved.filter(s => stripTime(toDate(s.date)).getTime()===stripTime(d).getTime()).reduce((a,s)=>a+(+s.price||0),0);
-              return { date:d, h: tot };
-            });
-            const max = Math.max(...arr.map(a=>a.h),1);
-            return arr.map(a=> ({...a, h: Math.max(6, Math.round(60*a.h/max))}));
-          }, [saved]);
-
+        const GoalsView = () => {
           return (
             <>
-              <div className="summary">
-                <div className="sum-card"><div className="sum-label">Denna vecka</div><div className="sum-value">{weekSaved.toFixed(2)} {settings.currency}</div></div>
-                <div className="sum-card"><div className="sum-label">Denna månad</div><div className="sum-value">{monthSaved.toFixed(2)} {settings.currency}</div></div>
-                <div className="sum-card"><div className="sum-label">Detta år</div><div className="sum-value">{yearSaved.toFixed(2)} {settings.currency}</div></div>
-              </div>
-
-              <div className="card" style={{padding:"6px 8px", marginBottom:12}}>
-                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Senaste 14 dagarna</div>
-                <div className="bars">
-                  {barsAll.map((b, i) => <div key={i} className="bar" style={{height:b.h+'px'}} title={b.date.toLocaleDateString()}></div>)}
+              {/* Skapa mål */}
+              <div className="card" style={{padding:"14px"}}>
+                <div className="goal-form">
+                  <SafeInput type="text" placeholder="Namn på mål (t.ex. Resa)" value={gName} onChange={e=>setGName(e.target.value)} />
+                  <SafeInput type="number" step="0.01" placeholder="Målsumma (kr)" value={gTarget} onChange={e=>setGTarget(e.target.value)} />
+                  <button className="btn btn-add" onClick={createGoal}>Skapa mål</button>
+                </div>
+                <div className="muted" style={{marginTop:6}}>Välj vilka impulsköp som ska kopplas till detta mål:</div>
+                <div className="chips">
+                  {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
+                  {items.map(i => (
+                    <label key={i.id} className="chip" style={{cursor:"pointer"}}>
+                      <input type="checkbox"
+                        checked={!!gChecked[i.id]}
+                        onChange={e=>setGChecked(s=>({...s, [i.id]:e.target.checked}))}
+                        style={{marginRight:8}} />
+                      {i.name} ({i.price} kr)
+                    </label>
+                  ))}
                 </div>
               </div>
 
-              <div className="card" style={{padding:14}}>
-                <div style={{ fontWeight:600, marginBottom:8 }}>Topp 5 avståenden</div>
-                {byItem.length===0 && <div className="muted">Inget att visa ännu.</div>}
-                {byItem.length>0 && (
-                  <table className="table">
-                    <tbody>
-                      {byItem.map(([name,sum])=>(
-                        <tr key={name}><td>{name}</td><td className="right">{sum.toFixed(2)} {settings.currency}</td></tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
+              {/* Lista mål */}
+              {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
+              {goals.map(goal => {
+                const pct = Math.min(100, Math.round((goal.amount||0) / (goal.target||1) * 100));
+                return (
+                  <div key={goal.id} className="goal-card">
+                    <div className="goal-head">
+                      <div>
+                        <strong>{goal.name}</strong>
+                        <div className="muted">Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount||0).toFixed(2)} kr ({pct}%)</div>
+                      </div>
+                      <button className="btn danger" onClick={()=>removeGoal(goal.id)}>Ta bort</button>
+                    </div>
+
+                    <div className="progress" style={{margin:"10px 0 8px"}}>
+                      <div style={{width:pct+"%"}}></div>
+                    </div>
+
+                    <div className="muted">Kopplade impulsköp</div>
+                    <div className="chips">
+                      {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
+                      {items.map(i => {
+                        const checked = !!(goal.itemIds||[]).includes(i.id);
+                        return (
+                          <label key={i.id} className="chip" style={{cursor:"pointer"}}>
+                            <input type="checkbox"
+                                   checked={checked}
+                                   onChange={(e)=>toggleLink(goal.id, i.id, e.target.checked)}
+                                   style={{marginRight:8}}/>
+                            {i.name} ({i.price} kr)
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <div className="goal-actions">
+                      <GoalDepositInput onAdd={amt=>addDeposit(goal.id, amt)} />
+                    </div>
+                  </div>
+                );
+              })}
             </>
           );
         };
 
-        /* ---------- HISTORY ---------- */
-        const [q, setQ] = useState("");
-        const [catFilter, setCatFilter] = useState("all");
-        const hist = useMemo(() => {
-          return saved.filter(s => {
-            const okQ = q.trim()? s.name.toLowerCase().includes(q.trim().toLowerCase()): true;
-            const item = items.find(i=>i.id===s.id) || items.find(i=>i.name===s.name);
-            const okC = (catFilter==="all") ? true : (item && item.categoryId===catFilter);
-            return okQ && okC;
-          });
-        }, [saved,q,catFilter,items]);
-
-        const exportJSON = () => {
-          const blob = new Blob([JSON.stringify(saved,null,2)], {type:"application/json"});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a"); a.href=url; a.download="saved-history.json"; a.click(); URL.revokeObjectURL(url);
-        };
-        const exportCSV = () => {
-          const rows = [["date","name","price"]];
-          saved.forEach(s=> rows.push([s.date,s.name,s.price]));
-          const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-          const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a"); a.href=url; a.download="saved-history.csv"; a.click(); URL.revokeObjectURL(url);
-        };
-
-        const HistoryView = () => (
-          <>
-            <div className="card" style={{padding:14, marginBottom:12}}>
-              <div className="row-sm">
-                <input type="text" placeholder="Sök i namn..." value={q} onChange={e=>setQ(e.target.value)} />
-                <select value={catFilter} onChange={e=>setCatFilter(e.target.value)}>
-                  <option value="all">Alla kategorier</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
-                </select>
-                <button className="btn" onClick={exportCSV}>Exportera CSV</button>
-                <button className="btn" onClick={exportJSON}>Exportera JSON</button>
-              </div>
-            </div>
-
-            {hist.length===0 && <div className="empty">Ingen historik matchar filtren.</div>}
-            {hist.length>0 && (
-              <div className="card">
-                {hist.slice(0,300).map(s => (
-                  <div className="list-item" key={s.sid}>
-                    <div><strong>{s.name}</strong> <span className="muted">{s.price} {settings.currency}</span></div>
-                    <div className="actions">
-                      <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
-                      <button className="btn danger" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        );
-
-        /* ---------- CATEGORIES ---------- */
-        const [cName, setCName] = useState("");
-        const [cEmoji, setCEmoji] = useState("🏷️");
-        const createCat = () => {
-          if(!cName.trim()){ alert("Ange namn"); return; }
-          setCategories(prev => [{id:String(Date.now()), name:cName.trim(), emoji:cEmoji}, ...prev]);
-          setCName("");
-        };
-        const removeCat = (id) => {
-          if(!confirm("Ta bort kategorin? (items behåller pris men tappar kategori)")) return;
-          setCategories(prev => prev.filter(c=>c.id!==id));
-          setItems(prev => prev.map(i => i.categoryId===id ? {...i, categoryId:null} : i));
-        };
-
-        const CategoriesView = () => (
-          <>
-            <div className="card" style={{padding:14}}>
-              <div className="row-sm">
-                <input placeholder="Ny kategori (t.ex. Kaffe)" value={cName} onChange={e=>setCName(e.target.value)} />
-                <input placeholder="Emoji (t.ex. ☕)" value={cEmoji} onChange={e=>setCEmoji(e.target.value)} />
-                <button className="btn btn-add" onClick={createCat}>Skapa</button>
-              </div>
-              <div className="note" style={{marginTop:6}}>Koppla items nedan till en kategori.</div>
-            </div>
-
-            <div className="card" style={{padding:14, marginTop:12}}>
-              <div style={{fontWeight:600, marginBottom:8}}>Kategorier</div>
-              {categories.length===0 && <div className="muted">Inga kategorier ännu.</div>}
-              {categories.map(c=>(
-                <div className="list-item" key={c.id}>
-                  <div><span className="pill">{c.emoji}</span> <strong style={{marginLeft:6}}>{c.name}</strong></div>
-                  <button className="btn danger" onClick={()=>removeCat(c.id)}>Ta bort</button>
-                </div>
-              ))}
-            </div>
-
-            <div className="card" style={{padding:14, marginTop:12}}>
-              <div style={{fontWeight:600, marginBottom:8}}>Koppla items</div>
-              {items.length===0 && <div className="muted">Inga items ännu.</div>}
-              {items.map(i=>(
-                <div className="list-item" key={i.id}>
-                  <div><strong>{i.name}</strong> <span className="muted">({i.price} {settings.currency})</span></div>
-                  <div style={{minWidth:200}}>
-                    <select value={i.categoryId||""} onChange={e=>{
-                      const val = e.target.value || null;
-                      setItems(prev => prev.map(x => x.id===i.id ? {...x, categoryId:val}: x));
-                    }}>
-                      <option value="">Ingen kategori</option>
-                      {categories.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        );
-
-        /* ---------- SETTINGS ---------- */
-        const SettingsView = () => (
-          <>
-            <div className="card" style={{padding:14}}>
-              <div style={{fontWeight:600, marginBottom:10}}>Allmänt</div>
-              <div className="row-sm">
-                <select value={settings.currency} onChange={e=>setSettings(s=>({...s, currency:e.target.value}))}>
-                  <option value="kr">kr</option><option value="€">€</option><option value="$">$</option><option value="£">£</option>
-                </select>
-                <select value={settings.weekStartsOn} onChange={e=>setSettings(s=>({...s, weekStartsOn:e.target.value}))}>
-                  <option value="monday">Vecka start: Måndag</option>
-                  <option value="sunday">Vecka start: Söndag</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="card" style={{padding:14, marginTop:12}}>
-              <div style={{fontWeight:600, marginBottom:10}}>Notiser (placeholder)</div>
-              <div className="row-sm">
-                <label className="chip" style={{display:"flex",alignItems:"center",gap:8}}>
-                  <input type="checkbox"
-                         checked={!!settings.notifications.weeklySummary.enabled}
-                         onChange={e=>setSettings(s=>({...s, notifications:{...s.notifications, weeklySummary:{...s.notifications.weeklySummary, enabled:e.target.checked}}}))}/>
-                  Veckosummering
-                </label>
-                <select value={settings.notifications.weeklySummary.day}
-                        onChange={e=>setSettings(s=>({...s, notifications:{...s.notifications, weeklySummary:{...s.notifications.weeklySummary, day:+e.target.value}}}))}>
-                  <option value="0">Söndag</option><option value="1">Måndag</option><option value="2">Tisdag</option><option value="3">Onsdag</option><option value="4">Torsdag</option><option value="5">Fredag</option><option value="6">Lördag</option>
-                </select>
-                <input type="time" value={settings.notifications.weeklySummary.time}
-                       onChange={e=>setSettings(s=>({...s, notifications:{...s.notifications, weeklySummary:{...s.notifications.weeklySummary, time:e.target.value}}}))}/>
-              </div>
-              <div className="note" style={{marginTop:6}}>Notiser kräver tillstånd och en push-tjänst. Vi kan koppla på OneSignal senare.</div>
-            </div>
-
-            <div className="card" style={{padding:14, marginTop:12}}>
-              <div style={{fontWeight:600, marginBottom:10}}>Data</div>
-              <div className="row-sm">
-                <button className="btn" onClick={()=>{
-                  const blob = new Blob([JSON.stringify({items,saved,goals,categories,settings},null,2)],{type:"application/json"});
-                  const url = URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="saved-it-backup.json"; a.click(); URL.revokeObjectURL(url);
-                }}>Exportera backup</button>
-                <label className="btn" style={{display:"inline-flex",alignItems:"center",gap:8,cursor:"pointer"}}>
-                  Importera backup
-                  <input type="file" accept="application/json" style="display:none" onChange={async e=>{
-                    const file = e.target.files?.[0]; if(!file) return;
-                    const text = await file.text(); try{
-                      const data = JSON.parse(text);
-                      if(confirm("Importera backup och ersätt nuvarande data?")){
-                        saveLS("items", data.items||[]); saveLS("saved", data.saved||[]);
-                        saveLS("goals", data.goals||[]); saveLS("categories", data.categories||[]);
-                        saveLS("settings", data.settings||settings); location.reload();
-                      }
-                    }catch(err){ alert("Ogiltig fil."); }
-                  }}/>
-                </label>
-                <button className="btn danger" onClick={()=>{ if(confirm("Återställ allt?")){ localStorage.clear(); location.reload(); } }}>Återställ allt</button>
-              </div>
-            </div>
-          </>
-        );
-
-        /* ---------- ABOUT ---------- */
-        const AboutView = () => (
-          <div className="card" style={{padding:14}}>
-            <h3 style={{marginTop:0}}>Om</h3>
-            <p><b>Saved it</b> hjälper dig spara pengar genom att logga impulsköp du avstår. All data lagras lokalt på din enhet.</p>
-            <p className="note">Tips (iPhone): Lägg först till sidan på hemskärmen, öppna därifrån och aktivera ev. notiser i menyn.</p>
-            <p className="note">Version: 1.0.0</p>
-          </div>
-        );
-
-        /* ---------- FEEDBACK ---------- */
-        const [fb, setFb] = useState({subject:"", message:"", email:""});
-        const FeedbackView = () => {
-          const mailto = `mailto:${encodeURIComponent(FEEDBACK_EMAIL)}?subject=${encodeURIComponent(fb.subject||"Saved it – feedback")}&body=${encodeURIComponent(`${fb.message||""}\n\n—\nE-post: ${fb.email||"-"}`)}`;
-          return (
-            <div className="card" style={{padding:14}}>
-              <h3 style={{marginTop:0}}>Feedback</h3>
-              <div className="row-sm" style={{marginBottom:8}}><input placeholder="Ämne" value={fb.subject} onChange={e=>setFb(s=>({...s,subject:e.target.value}))}/></div>
-              <div className="row-sm" style={{marginBottom:8}}><textarea rows="6" placeholder="Dina tankar/förslag…" value={fb.message} onChange={e=>setFb(s=>({...s,message:e.target.value}))}></textarea></div>
-              <div className="row-sm" style={{marginBottom:12}}><input placeholder="Din e-post (valfritt)" value={fb.email} onChange={e=>setFb(s=>({...s,email:e.target.value}))}/></div>
-              <a className="btn btn-add" href={mailto}>Skicka via e-post</a>
-              <div className="note" style={{marginTop:8}}>Knappen öppnar din e-postklient med texten förifylld.</div>
-            </div>
-          );
-        };
-
-        /* ---------- RENDER ---------- */
         return (
           <>
-            {view === "log"        && <LogView />}
-            {view === "goals"      && <GoalsView />}
-            {view === "insights"   && <InsightsView />}
-            {view === "history"    && <HistoryView />}
-            {view === "categories" && <CategoriesView />}
-            {view === "settings"   && <SettingsView />}
-            {view === "about"      && <AboutView />}
-            {view === "feedback"   && <FeedbackView />}
+            {view === "log"   && <LogView />}
+            {view === "goals" && <GoalsView />}
 
             <Drawer current={view} onChange={setView} />
           </>
+        );
+      }
+
+      function GoalDepositInput({onAdd}){
+        const [val, setVal] = React.useState("");
+        return (
+          <div style={{display:"flex", gap:"8px", width:"100%"}}>
+            <SafeInput type="number" step="0.01" placeholder="Insättning (kr)" value={val} onChange={e=>setVal(e.target.value)} />
+            <button className="btn" onClick={()=>{ onAdd(val); setVal(""); }}>Lägg till insättning</button>
+          </div>
         );
       }
 
@@ -793,4 +570,3 @@ useEffect(() => {
     </script>
   </body>
 </html>
-
