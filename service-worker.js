@@ -1,5 +1,5 @@
 // service-worker.js
-const CACHE_NAME = "savedit-v4";  // <-- ändra denna vid uppdatering
+const CACHE_NAME = "savedit-v6";  // <-- ändra denna vid uppdatering
 const urlsToCache = [
   "/",
   "/index.html",
@@ -38,3 +38,4 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
