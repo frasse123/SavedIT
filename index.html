@@ -102,7 +102,7 @@
       .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
       .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
 
-      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
+      .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); position: static !important; }
       .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
 
       /* Drawer */
@@ -209,6 +209,28 @@
 
         // View
         const [view, setView] = useState("log"); // log | goals | insights | history | categories | settings | about | feedback
+
+        // Stäng av sticky-footer när ett inputfält är fokus (iOS/Safari)
+useEffect(() => {
+  const onFocusIn = (e) => {
+    const t = e.target && e.target.tagName;
+    if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
+      document.body.classList.add('kb-open');
+    }
+  };
+  const onFocusOut = (e) => {
+    const t = e.target && e.target.tagName;
+    if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') {
+      document.body.classList.remove('kb-open');
+    }
+  };
+  window.addEventListener('focusin', onFocusIn);
+  window.addEventListener('focusout', onFocusOut);
+  return () => {
+    window.removeEventListener('focusin', onFocusIn);
+    window.removeEventListener('focusout', onFocusOut);
+  };
+}, []);
 
         useEffect(()=>saveLS("items", items), [items]);
         useEffect(()=>saveLS("saved", saved), [saved]);
@@ -771,3 +793,4 @@
     </script>
   </body>
 </html>
+
