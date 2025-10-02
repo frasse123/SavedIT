@@ -157,8 +157,11 @@
       const FEEDBACK_EMAIL = "din@epost.se"; // <-- BYT TILL DIN ADRESS
       const { useState, useEffect, useMemo, useRef } = React;
 
-      /* ---------- Fristående (stabila) komponenter: definieras UTANFÖR App ---------- */
+      /* Helpers – MÅSTE vara definierade innan App använder dem */
+      const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
+      const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
+      /* ---------- Fristående komponenter (stabila) ---------- */
       const SimpleCard = ({title, text}) => (
         <div className="card" style={{padding:"16px"}}>
           <h3 style={{margin:"0 0 8px"}}>{title}</h3>
@@ -166,7 +169,7 @@
         </div>
       );
 
-      function LogView({items, setItems, saveMoney, saved, deleteSaved, clearHistory, tab, setTab, totals, bars, tabLabel}) {
+      function LogView({items, setItems, saveMoney, deleteSaved, clearHistory, tab, setTab, totals, bars, tabLabel}) {
         const nameRef  = useRef(null);
         const priceRef = useRef(null);
 
@@ -252,7 +255,7 @@
                     <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
                     <div className="actions">
                       <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
-                      <button className="btn danger" type="button" onClick={()=>totals.deleteSaved(s.sid)}>Ta bort</button>
+                      <button className="btn danger" type="button" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
                     </div>
                   </div>
                 ))}
@@ -273,37 +276,17 @@
           <>
             <div className="card" style={{ padding: "14px" }}>
               <div className="row" style={{ gridTemplateColumns: "1fr 160px auto" }}>
-                <input
-                  type="text"
-                  placeholder="Namn på mål (t.ex. Resa)"
-                  value={gName}
-                  onChange={e => setGName(e.target.value)}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Målsumma (kr)"
-                  value={gTarget}
-                  onChange={e => setGTarget(e.target.value)}
-                />
-                <button className="btn btn-add" type="button" onClick={createGoal}>
-                  Skapa mål
-                </button>
+                <input type="text" placeholder="Namn på mål (t.ex. Resa)" value={gName} onChange={e => setGName(e.target.value)} />
+                <input type="number" step="0.01" placeholder="Målsumma (kr)" value={gTarget} onChange={e => setGTarget(e.target.value)} />
+                <button className="btn btn-add" type="button" onClick={createGoal}>Skapa mål</button>
               </div>
 
-              <div className="muted" style={{ marginTop: 6 }}>
-                Välj vilka impulsköp som ska kopplas till detta mål:
-              </div>
+              <div className="muted" style={{ marginTop: 6 }}>Välj vilka impulsköp som ska kopplas till detta mål:</div>
               <div className="chips">
                 {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
                 {items.map(i => (
                   <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={!!gChecked[i.id]}
-                      onChange={e => setGChecked(s => ({ ...s, [i.id]: e.target.checked }))}
-                      style={{ marginRight: 8 }}
-                    />
+                    <input type="checkbox" checked={!!gChecked[i.id]} onChange={e => setGChecked(s => ({ ...s, [i.id]: e.target.checked }))} style={{ marginRight: 8 }} />
                     {i.name} ({i.price} kr)
                   </label>
                 ))}
@@ -318,13 +301,9 @@
                   <div className="list-item" style={{ borderBottom: "0", padding: "0", marginBottom: "10px" }}>
                     <div>
                       <strong>{goal.name}</strong>
-                      <div className="muted">
-                        Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount || 0).toFixed(2)} kr ({pct}%)
-                      </div>
+                      <div className="muted">Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount || 0).toFixed(2)} kr ({pct}%)</div>
                     </div>
-                    <button className="btn danger" type="button" onClick={() => removeGoal(goal.id)}>
-                      Ta bort
-                    </button>
+                    <button className="btn danger" type="button" onClick={() => removeGoal(goal.id)}>Ta bort</button>
                   </div>
 
                   <div className="progress" style={{ height: "10px", borderRadius: "999px", background: "#eef2f7", overflow: "hidden", margin: "10px 0 8px" }}>
@@ -338,12 +317,7 @@
                       const checked = !!(goal.itemIds || []).includes(i.id);
                       return (
                         <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={e => toggleLink(goal.id, i.id, e.target.checked)}
-                            style={{ marginRight: 8 }}
-                          />
+                          <input type="checkbox" checked={checked} onChange={e => toggleLink(goal.id, i.id, e.target.checked)} style={{ marginRight: 8 }} />
                           {i.name} ({i.price} kr)
                         </label>
                       );
@@ -351,16 +325,8 @@
                   </div>
 
                   <div style={{ display: "flex", gap: 8, width: "100%", marginTop: 8 }}>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="Insättning (kr)"
-                      value={depInputs[goal.id] || ""}
-                      onChange={e => setDep(goal.id, e.target.value)}
-                    />
-                    <button className="btn" type="button" onMouseDown={e => e.preventDefault()} onClick={() => commitDep(goal.id)}>
-                      Lägg till insättning
-                    </button>
+                    <input type="number" step="0.01" placeholder="Insättning (kr)" value={depInputs[goal.id] || ""} onChange={e => setDep(goal.id, e.target.value)} />
+                    <button className="btn" type="button" onMouseDown={e => e.preventDefault()} onClick={() => commitDep(goal.id)}>Lägg till insättning</button>
                   </div>
                 </div>
               );
@@ -382,16 +348,12 @@
       }
 
       /* -------------------------------- App -------------------------------- */
-
       function App(){
         const [items, setItems]   = useState(() => load("items", []));
         const [saved, setSaved]   = useState(() => load("saved", []));
         const [goals, setGoals]   = useState(() => load("goals", []));
         const [view, setView]     = useState("log");
         const [tab, setTab]       = useState("week");
-
-        const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
-        const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
         useEffect(() => save("items", items), [items]);
         useEffect(() => save("saved", saved), [saved]);
@@ -488,12 +450,11 @@
 
         return (
           <>
-            {view === "log"        && (
+            {view === "log" && (
               <LogView
                 items={items}
                 setItems={setItems}
                 saveMoney={saveMoney}
-                saved={saved}
                 deleteSaved={deleteSaved}
                 clearHistory={clearHistory}
                 tab={tab}
