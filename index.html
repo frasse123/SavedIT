@@ -20,7 +20,6 @@
     <script>
       (function computeBase(){
         const parts = location.pathname.split('/').filter(Boolean);
-        // Om appen ligger på /<REPO>/... blir BASE="/<REPO>/", annars "/"
         window.__BASE_PATH__ = parts.length ? `/${parts[0]}/` : '/';
       })();
     </script>
@@ -41,7 +40,6 @@
       input, button, select, textarea { width:100%; max-width:100%; min-width:0; }
       button { -webkit-tap-highlight-color: transparent; }
 
-      /* HERO */
       .hero{
         background: radial-gradient(1200px 300px at 30% -10%, #bff0ec 0%, transparent 60%),
                     linear-gradient(135deg, #d8f4f1 0%, #eaf6ff 40%, #f7f9ff 100%);
@@ -58,7 +56,6 @@
       .install{ padding:10px 14px; border-radius: 999px; background:#fff; border:1px solid var(--border); box-shadow:0 2px 10px rgba(2,6,23,.06); width:auto; }
       .install[hidden]{ display:none; }
 
-      /* MENU BTN (hamburger) */
       .menu-btn { width:38px; height:38px; border-radius:10px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; }
       .menu-btn span{ display:block; width:18px; height:2px; background:#0f172a; position:relative; }
       .menu-btn span::before, .menu-btn span::after{ content:""; position:absolute; left:0; width:18px; height:2px; background:#0f172a; }
@@ -66,7 +63,6 @@
 
       .content{ max-width: 860px; margin: 0 auto; padding: 22px; }
 
-      /* Inputs */
       .row{ display:grid; grid-template-columns: 1fr 160px auto; gap: 10px; margin: 10px 0 18px; }
       @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
       input[type="text"], input[type="number"]{
@@ -93,35 +89,28 @@
       .section h3{ margin:0; font-size: 16px; letter-spacing: .02em; color:#111; }
       .muted{ color:var(--muted); font-style:italic; text-align:center; margin:12px 0; }
 
-      /* Tabs */
       .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 6px; }
       .tab{ padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; cursor:pointer; font-weight:600; color:#334155; }
       .tab.active{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
 
-      /* Summary */
       .summary{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 16px; }
       @media (max-width: 560px){ .summary{ grid-template-columns: 1fr; } }
       .sum-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(15,23,42,.04); }
       .sum-label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
       .sum-value{ font-size:18px; font-weight:700; }
 
-      /* Bars */
       .bars{ display:flex; align-items:flex-end; gap:6px; padding:10px 6px; height:68px; }
       .bar{ flex:1; background:linear-gradient(180deg, rgba(15,118,110,.9), rgba(15,118,110,.5)); border-radius:6px; min-width:6px; }
 
       .stats{ position: sticky; bottom: 0; margin-top: 18px; padding: 14px 16px; background: var(--surface); border:1px solid var(--border); border-radius: 14px; box-shadow: 0 -1px 10px rgba(15,23,42,.06); }
       .empty{ text-align:center; color: var(--muted); padding: 18px 10px; }
 
-      /* Drawer */
       .drawer{ position:fixed; inset:0; background:rgba(2,6,23,.28); display:none; z-index:99; }
       .drawer.open{ display:block; }
       .panel{ position:absolute; top:0; left:0; width:280px; max-width:85%; height:100%; background:#fff; border-right:1px solid var(--border); box-shadow: 0 4px 24px rgba(2,6,23,.15); padding:18px; }
       .panel h4{ margin:0 0 8px; }
       .nav-btn{ display:block; width:100%; text-align:left; margin:6px 0; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#fff; font-weight:600; }
       .nav-btn.active{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; border-color:transparent; }
-
-      /* iOS: om sticky-footer jiddrar kan vi slå av den så här:
-      @supports (-webkit-touch-callout: none) { .stats { position: static; } } */
     </style>
   </head>
 
@@ -150,7 +139,7 @@
         <h4>Meny</h4>
         <button class="nav-btn" data-view="log"        type="button">Logg & översikt</button>
         <button class="nav-btn" data-view="goals"      type="button">Sparmål</button>
-        <button className="nav-btn" data-view="insights"   type="button">Insikter</button>
+        <button class="nav-btn" data-view="insights"   type="button">Insikter</button>
         <button class="nav-btn" data-view="history"    type="button">Historik</button>
         <button class="nav-btn" data-view="categories" type="button">Kategorier</button>
         <button class="nav-btn" data-view="settings"   type="button">Inställningar</button>
@@ -168,47 +157,19 @@
       const FEEDBACK_EMAIL = "din@epost.se"; // <-- BYT TILL DIN ADRESS
       const { useState, useEffect, useMemo, useRef } = React;
 
-      // Storage
-      const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
-      const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      /* ---------- Fristående (stabila) komponenter: definieras UTANFÖR App ---------- */
 
-      // Date utils
-      const toDate = (iso) => new Date(iso);
-      const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
-      const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
-      const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
-      const isInRange = (date, start) => stripTime(date) >= stripTime(start);
+      const SimpleCard = ({title, text}) => (
+        <div className="card" style={{padding:"16px"}}>
+          <h3 style={{margin:"0 0 8px"}}>{title}</h3>
+          <div className="muted">{text}</div>
+        </div>
+      );
 
-      function App(){
-        // Data
-        const [items, setItems]   = useState(() => load("items", []));
-        const [saved, setSaved]   = useState(() => load("saved", []));
-        const [goals, setGoals]   = useState(() => load("goals", []));
-        // UI
-        const [view, setView]     = useState("log");   // log | goals | insights | history | categories | settings | about | feedback
-        const [tab, setTab]       = useState("week");  // week | month | year | all
-
-        // Uncontrolled inputs (iOS-stabilt)
+      function LogView({items, setItems, saveMoney, saved, deleteSaved, clearHistory, tab, setTab, totals, bars, tabLabel}) {
         const nameRef  = useRef(null);
         const priceRef = useRef(null);
 
-        useEffect(() => save("items", items), [items]);
-        useEffect(() => save("saved", saved), [saved]);
-        useEffect(() => save("goals", goals), [goals]);
-
-        /* Drawer – CSS toggle (ingen unmount/remount av inputs) */
-        useEffect(() => {
-          const drawer = document.getElementById("drawer");
-          const btn = document.getElementById("menuBtn");
-          const open  = () => drawer.classList.add("open");
-          const close = (e) => { if(e.target === drawer) drawer.classList.remove("open"); };
-          btn.addEventListener("click", open);
-          drawer.addEventListener("click", close);
-          return () => { btn.removeEventListener("click", open); drawer.removeEventListener("click", close); };
-        }, []);
-
-        /* Items / Saved */
         const addItem = () => {
           const name = (nameRef.current?.value || "").trim();
           const raw  = (priceRef.current?.value || "").replace(",", ".").trim();
@@ -219,12 +180,236 @@
           if (nameRef.current)  { nameRef.current.value = ""; nameRef.current.focus(); }
           if (priceRef.current) { priceRef.current.value = ""; }
         };
-        const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
 
-        const saveMoney  = (item) => {
+        return (
+          <>
+            <div className="row">
+              <input ref={nameRef} type="text" placeholder="Namn (t.ex. Latte)" autoComplete="off" autoCorrect="off" autoCapitalize="none" inputMode="text" />
+              <input ref={priceRef} type="text" placeholder="Pris" inputMode="decimal" pattern="[0-9]*[.,]?[0-9]*" autoComplete="off" />
+              <button className="btn btn-add" type="button" onMouseDown={(e)=>e.preventDefault()} onClick={addItem}>Lägg till</button>
+            </div>
+
+            {items.length === 0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
+            {items.length > 0 && (
+              <div className="card">
+                {items.map(item => (
+                  <div className="list-item" key={item.id}>
+                    <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
+                    <div className="actions">
+                      <button className="btn save"   type="button" onClick={()=>saveMoney(item)}>Avstod</button>
+                      <button className="btn danger" type="button" onClick={()=>setItems(prev => prev.filter(i => i.id !== item.id))}>Ta bort</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="section"><h3>Översikt</h3></div>
+            <div className="tabs">
+              {["week","month","year","all"].map(key => (
+                <button key={key} type="button" className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
+                  {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
+                </button>
+              ))}
+            </div>
+
+            <div className="summary">
+              <div className="sum-card">
+                <div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div>
+                <div className="sum-value">{totals.period.toFixed(2)} kr</div>
+              </div>
+              <div className="sum-card">
+                <div className="sum-label">Antal avståenden</div>
+                <div className="sum-value">{totals.count}</div>
+              </div>
+              <div className="sum-card">
+                <div className="sum-label">Totalt (alla tider)</div>
+                <div className="sum-value">{totals.all.toFixed(2)} kr</div>
+              </div>
+            </div>
+
+            {bars.length > 0 && (
+              <div className="card" style={{padding:"6px 8px"}}>
+                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Logg för {tabLabel.toLowerCase()}</div>
+                <div className="bars">
+                  {bars.map((b, i) => (
+                    <div key={i} className="bar" style={{height:b.h+'px'}} title={b.date.toLocaleDateString()}></div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="section">
+              <h3>Historik – {tabLabel.toLowerCase()}</h3>
+              {totals.all > 0 && <button className="btn danger" type="button" onClick={clearHistory}>Rensa all historik</button>}
+            </div>
+
+            {totals.count === 0 && <div className="empty">Du har inte avstått något i vald period.</div>}
+            {totals.count > 0 && (
+              <div className="card">
+                {totals.filtered.slice(0,100).map(s => (
+                  <div className="list-item" key={s.sid}>
+                    <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
+                    <div className="actions">
+                      <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
+                      <button className="btn danger" type="button" onClick={()=>totals.deleteSaved(s.sid)}>Ta bort</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="stats"><b>Totalt sparat: {totals.all.toFixed(2)} kr</b></div>
+          </>
+        );
+      }
+
+      function GoalsView({items, goals, setGoals, gName, setGName, gTarget, setGTarget, gChecked, setGChecked, createGoal, removeGoal, addDeposit, toggleLink}) {
+        const [depInputs, setDepInputs] = React.useState({});
+        const setDep = (id, v) => setDepInputs(s => ({ ...s, [id]: v || "" }));
+        const commitDep = (id) => { addDeposit(id, depInputs[id] || ""); setDep(id, ""); };
+
+        return (
+          <>
+            <div className="card" style={{ padding: "14px" }}>
+              <div className="row" style={{ gridTemplateColumns: "1fr 160px auto" }}>
+                <input
+                  type="text"
+                  placeholder="Namn på mål (t.ex. Resa)"
+                  value={gName}
+                  onChange={e => setGName(e.target.value)}
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Målsumma (kr)"
+                  value={gTarget}
+                  onChange={e => setGTarget(e.target.value)}
+                />
+                <button className="btn btn-add" type="button" onClick={createGoal}>
+                  Skapa mål
+                </button>
+              </div>
+
+              <div className="muted" style={{ marginTop: 6 }}>
+                Välj vilka impulsköp som ska kopplas till detta mål:
+              </div>
+              <div className="chips">
+                {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
+                {items.map(i => (
+                  <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={!!gChecked[i.id]}
+                      onChange={e => setGChecked(s => ({ ...s, [i.id]: e.target.checked }))}
+                      style={{ marginRight: 8 }}
+                    />
+                    {i.name} ({i.price} kr)
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
+            {goals.map(goal => {
+              const pct = Math.min(100, Math.round(((goal.amount || 0) / (goal.target || 1)) * 100));
+              return (
+                <div key={goal.id} className="card" style={{ padding: "14px", marginTop: "12px" }}>
+                  <div className="list-item" style={{ borderBottom: "0", padding: "0", marginBottom: "10px" }}>
+                    <div>
+                      <strong>{goal.name}</strong>
+                      <div className="muted">
+                        Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount || 0).toFixed(2)} kr ({pct}%)
+                      </div>
+                    </div>
+                    <button className="btn danger" type="button" onClick={() => removeGoal(goal.id)}>
+                      Ta bort
+                    </button>
+                  </div>
+
+                  <div className="progress" style={{ height: "10px", borderRadius: "999px", background: "#eef2f7", overflow: "hidden", margin: "10px 0 8px" }}>
+                    <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }} />
+                  </div>
+
+                  <div className="muted">Kopplade impulsköp</div>
+                  <div className="chips">
+                    {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
+                    {items.map(i => {
+                      const checked = !!(goal.itemIds || []).includes(i.id);
+                      return (
+                        <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={e => toggleLink(goal.id, i.id, e.target.checked)}
+                            style={{ marginRight: 8 }}
+                          />
+                          {i.name} ({i.price} kr)
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8, width: "100%", marginTop: 8 }}>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Insättning (kr)"
+                      value={depInputs[goal.id] || ""}
+                      onChange={e => setDep(goal.id, e.target.value)}
+                    />
+                    <button className="btn" type="button" onMouseDown={e => e.preventDefault()} onClick={() => commitDep(goal.id)}>
+                      Lägg till insättning
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        );
+      }
+
+      function Drawer({current, onChange}){
+        useEffect(() => {
+          const drawer = document.getElementById("drawer");
+          const buttons = drawer.querySelectorAll('.nav-btn');
+          buttons.forEach(b => {
+            b.classList.toggle('active', b.dataset.view === current);
+            b.onclick = () => { onChange(b.dataset.view); drawer.classList.remove("open"); };
+          });
+        }, [current, onChange]);
+        return null;
+      }
+
+      /* -------------------------------- App -------------------------------- */
+
+      function App(){
+        const [items, setItems]   = useState(() => load("items", []));
+        const [saved, setSaved]   = useState(() => load("saved", []));
+        const [goals, setGoals]   = useState(() => load("goals", []));
+        const [view, setView]     = useState("log");
+        const [tab, setTab]       = useState("week");
+
+        const load = (k, f) => { try{ const v = localStorage.getItem(k); return v? JSON.parse(v): f; } catch { return f; } };
+        const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+        useEffect(() => save("items", items), [items]);
+        useEffect(() => save("saved", saved), [saved]);
+        useEffect(() => save("goals", goals), [goals]);
+
+        useEffect(() => {
+          const drawer = document.getElementById("drawer");
+          const btn = document.getElementById("menuBtn");
+          const open  = () => drawer.classList.add("open");
+          const close = (e) => { if(e.target === drawer) drawer.classList.remove("open"); };
+          btn.addEventListener("click", open);
+          drawer.addEventListener("click", close);
+          return () => { btn.removeEventListener("click", open); drawer.removeEventListener("click", close); };
+        }, []);
+
+        const saveMoney = (item) => {
           const entry = { ...item, sid:String(Date.now()), date:new Date().toISOString() };
           setSaved(prev => [entry, ...prev]);
-          // kreditera länkade mål
           setGoals(prev => prev.map(g => (
             (g.itemIds||[]).includes(item.id)
               ? { ...g, amount:(g.amount||0)+(+item.price||0),
@@ -232,10 +417,16 @@
               : g
           )));
         };
-        const deleteSaved= (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
+        const deleteSaved = (sid) => setSaved(prev => prev.filter(s => s.sid !== sid));
         const clearHistory = () => { if(confirm("Rensa hela historiken?")) setSaved([]); };
 
-        /* Period / summering */
+        const toDate = (iso) => new Date(iso);
+        const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const startOfWeek = (d) => { const day = d.getDay(); const diff = (day === 0 ? -6 : 1) - day; const s = new Date(d); s.setDate(d.getDate()+diff); return stripTime(s); };
+        const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
+        const startOfYear  = (d) => new Date(d.getFullYear(), 0, 1);
+        const isInRange = (date, start) => stripTime(date) >= stripTime(start);
+
         const today = new Date();
         const periodStart = useMemo(() => {
           if(tab === "week")  return startOfWeek(today);
@@ -245,9 +436,13 @@
         }, [tab]);
 
         const filtered = useMemo(() => saved.filter(s => isInRange(toDate(s.date), periodStart)), [saved, periodStart]);
-        const totalSavedAll   = useMemo(() => saved.reduce((a,s)=>a+(+s.price||0), 0), [saved]);
-        const totalSavedPeriod= useMemo(() => filtered.reduce((a,s)=>a+(+s.price||0), 0), [filtered]);
-
+        const totals = {
+          all: saved.reduce((a,s)=>a+(+s.price||0), 0),
+          period: filtered.reduce((a,s)=>a+(+s.price||0), 0),
+          count: filtered.length,
+          filtered,
+          deleteSaved
+        };
         const bars = useMemo(() => {
           const map = new Map();
           for(const s of filtered){
@@ -261,10 +456,10 @@
         }, [filtered]);
         const tabLabel = { week:"Vecka", month:"Månad", year:"År", all:"Alla" }[tab];
 
-        /* Goals */
         const [gName, setGName] = useState("");
         const [gTarget, setGTarget] = useState("");
         const [gChecked, setGChecked] = useState({});
+
         const createGoal = () => {
           const name = gName.trim();
           const target = Number((gTarget||"").replace(",", "."));
@@ -291,265 +486,49 @@
           }));
         };
 
-        /* ===== Views ===== */
-        const LogView = () => (
-          <>
-            <div className="row">
-              <input
-                ref={nameRef}
-                type="text"
-                placeholder="Namn (t.ex. Latte)"
-                autoComplete="off" autoCorrect="off" autoCapitalize="none" inputMode="text"
-              />
-              <input
-                ref={priceRef}
-                type="text"
-                placeholder="Pris"
-                inputMode="decimal" pattern="[0-9]*[.,]?[0-9]*" autoComplete="off"
-              />
-              <button
-                className="btn btn-add" type="button"
-                onMouseDown={(e)=>e.preventDefault()}
-                onClick={addItem}
-              >Lägg till</button>
-            </div>
-
-            {items.length === 0 && <div className="empty">Inga impulsköp tillagda ännu.</div>}
-            {items.length > 0 && (
-              <div className="card">
-                {items.map(item => (
-                  <div className="list-item" key={item.id}>
-                    <div><strong>{item.name}</strong> <span className="muted">({item.price} kr)</span></div>
-                    <div className="actions">
-                      <button className="btn save"   type="button" onClick={()=>saveMoney(item)}>Avstod</button>
-                      <button className="btn danger" type="button" onClick={()=>removeItem(item.id)}>Ta bort</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="section"><h3>Översikt</h3></div>
-            <div className="tabs">
-              {["week","month","year","all"].map(key => (
-                <button key={key} type="button" className={"tab"+(tab===key?" active":"")} onClick={()=>setTab(key)}>
-                  {({week:"Vecka",month:"Månad",year:"År",all:"Alla"})[key]}
-                </button>
-              ))}
-            </div>
-
-            <div className="summary">
-              <div className="sum-card">
-                <div className="sum-label">Totalt sparat – {tabLabel.toLowerCase()}</div>
-                <div className="sum-value">{totalSavedPeriod.toFixed(2)} kr</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Antal avståenden</div>
-                <div className="sum-value">{filtered.length}</div>
-              </div>
-              <div className="sum-card">
-                <div className="sum-label">Totalt (alla tider)</div>
-                <div className="sum-value">{totalSavedAll.toFixed(2)} kr</div>
-              </div>
-            </div>
-
-            {filtered.length > 0 && (
-              <div className="card" style={{padding:"6px 8px"}}>
-                <div style={{ padding:'6px 10px', fontWeight:600, color:'#334155' }}>Logg för {tabLabel.toLowerCase()}</div>
-                <div className="bars">
-                  {bars.map((b, i) => (
-                    <div key={i} className="bar" style={{height:b.h+'px'}} title={b.date.toLocaleDateString()}></div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="section">
-              <h3>Historik – {tabLabel.toLowerCase()}</h3>
-              {saved.length > 0 && <button className="btn danger" type="button" onClick={clearHistory}>Rensa all historik</button>}
-            </div>
-
-            {filtered.length === 0 && <div className="empty">Du har inte avstått något i vald period.</div>}
-            {filtered.length > 0 && (
-              <div className="card">
-                {filtered.slice(0,100).map(s => (
-                  <div className="list-item" key={s.sid}>
-                    <div><strong>{s.name}</strong> <span className="muted">{s.price} kr</span></div>
-                    <div className="actions">
-                      <span className="muted" style={{alignSelf:"center"}}>{new Date(s.date).toLocaleString()}</span>
-                      <button className="btn danger" type="button" onClick={()=>deleteSaved(s.sid)}>Ta bort</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="stats"><b>Totalt sparat: {totalSavedAll.toFixed(2)} kr</b></div>
-          </>
-        );
-
-const GoalsView = () => {
-  const [depInputs, setDepInputs] = React.useState({});
-  const setDep = (id, v) => setDepInputs(s => ({ ...s, [id]: v || "" }));
-  const commitDep = (id) => { addDeposit(id, depInputs[id] || ""); setDep(id, ""); };
-
-  return (
-    <>
-      {/* Skapa mål */}
-      <div className="card" style={{ padding: "14px" }}>
-        <div className="row" style={{ gridTemplateColumns: "1fr 160px auto" }}>
-          <input
-            type="text"
-            placeholder="Namn på mål (t.ex. Resa)"
-            value={gName}
-            onChange={e => setGName(e.target.value)}
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Målsumma (kr)"
-            value={gTarget}
-            onChange={e => setGTarget(e.target.value)}
-          />
-          <button className="btn btn-add" type="button" onClick={createGoal}>
-            Skapa mål
-          </button>
-        </div>
-
-        <div className="muted" style={{ marginTop: 6 }}>
-          Välj vilka impulsköp som ska kopplas till detta mål:
-        </div>
-        <div className="chips">
-          {items.length === 0 && <span className="muted">Inga impulsköp tillagda ännu.</span>}
-          {items.map(i => (
-            <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={!!gChecked[i.id]}
-                onChange={e => setGChecked(s => ({ ...s, [i.id]: e.target.checked }))}
-                style={{ marginRight: 8 }}
-              />
-              {i.name} ({i.price} kr)
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Lista mål */}
-      {goals.length === 0 && <div className="empty">Inga mål ännu. Skapa ditt första ovan! ✨</div>}
-      {goals.map(goal => {
-        const pct = Math.min(100, Math.round(((goal.amount || 0) / (goal.target || 1)) * 100));
-        return (
-          <div key={goal.id} className="card" style={{ padding: "14px", marginTop: "12px" }}>
-            <div className="list-item" style={{ borderBottom: "0", padding: "0", marginBottom: "10px" }}>
-              <div>
-                <strong>{goal.name}</strong>
-                <div className="muted">
-                  Mål: {goal.target.toFixed ? goal.target.toFixed(2) : goal.target} kr · Sparat: {(goal.amount || 0).toFixed(2)} kr ({pct}%)
-                </div>
-              </div>
-              <button className="btn danger" type="button" onClick={() => removeGoal(goal.id)}>
-                Ta bort
-              </button>
-            </div>
-
-            {/* Progress */}
-            <div className="progress" style={{ height: "10px", borderRadius: "999px", background: "#eef2f7", overflow: "hidden", margin: "10px 0 8px" }}>
-              <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }} />
-            </div>
-
-            {/* Kopplade items */}
-            <div className="muted">Kopplade impulsköp</div>
-            <div className="chips">
-              {items.length === 0 && <span className="muted">Inga impulsköp i listan.</span>}
-              {items.map(i => {
-                const checked = !!(goal.itemIds || []).includes(i.id);
-                return (
-                  <label key={i.id} className="chip" style={{ cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={e => toggleLink(goal.id, i.id, e.target.checked)}
-                      style={{ marginRight: 8 }}
-                    />
-                    {i.name} ({i.price} kr)
-                  </label>
-                );
-              })}
-            </div>
-
-            {/* Insättning */}
-            <div style={{ display: "flex", gap: 8, width: "100%", marginTop: 8 }}>
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Insättning (kr)"
-                value={depInputs[goal.id] || ""}
-                onChange={e => setDep(goal.id, e.target.value)}
-              />
-              <button
-                className="btn"
-                type="button"
-                onMouseDown={e => e.preventDefault()}
-                onClick={() => commitDep(goal.id)}
-              >
-                Lägg till insättning
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-
-        /* Övriga sidor – placeholders */
-        const SimpleCard = ({title, text}) => (
-          <div className="card" style={{padding:"16px"}}>
-            <h3 style={{margin:"0 0 8px"}}>{title}</h3>
-            <div className="muted">{text}</div>
-          </div>
-        );
-
-        const InsightsView   = () => <SimpleCard title="Insikter"   text="Här kan vi visa diagram, bästa avståenden, trender m.m." />;
-        const HistoryPage    = () => <SimpleCard title="Historik"    text="Separat historik med sök/filtrering kan hamna här." />;
-        const CategoriesView = () => <SimpleCard title="Kategorier"  text="Lägg till/hantera kategorier och koppla impulsköp till dem." />;
-        const SettingsView   = () => <SimpleCard title="Inställningar" text="Tema, notiser och export/import (kommer senare)." />;
-        const AboutView      = () => <SimpleCard title="Om" text="Saved it – logga avståenden och spara pengar. Allt lagras lokalt." />;
-        const FeedbackView   = () => (
-          <div className="card" style={{padding:"16px"}}>
-            <h3 style={{margin:"0 0 8px"}}>Feedback</h3>
-            <div className="muted">Maila gärna idéer och förslag: <a href={`mailto:${FEEDBACK_EMAIL}`}>{FEEDBACK_EMAIL}</a></div>
-          </div>
-        );
-
         return (
           <>
-            {view === "log"        && <LogView />}
-            {view === "goals"      && <GoalsView />}
-            {view === "insights"   && <InsightsView />}
-            {view === "history"    && <HistoryPage />}
-            {view === "categories" && <CategoriesView />}
-            {view === "settings"   && <SettingsView />}
-            {view === "about"      && <AboutView />}
-            {view === "feedback"   && <FeedbackView />}
+            {view === "log"        && (
+              <LogView
+                items={items}
+                setItems={setItems}
+                saveMoney={saveMoney}
+                saved={saved}
+                deleteSaved={deleteSaved}
+                clearHistory={clearHistory}
+                tab={tab}
+                setTab={setTab}
+                totals={totals}
+                bars={bars}
+                tabLabel={tabLabel}
+              />
+            )}
+
+            {view === "goals" && (
+              <GoalsView
+                items={items}
+                goals={goals}
+                setGoals={setGoals}
+                gName={gName} setGName={setGName}
+                gTarget={gTarget} setGTarget={setGTarget}
+                gChecked={gChecked} setGChecked={setGChecked}
+                createGoal={createGoal}
+                removeGoal={removeGoal}
+                addDeposit={addDeposit}
+                toggleLink={toggleLink}
+              />
+            )}
+
+            {view === "insights"   && <SimpleCard title="Insikter"   text="Här kan vi visa diagram, bästa avståenden, trender m.m." />}
+            {view === "history"    && <SimpleCard title="Historik"    text="Separat historik med sök/filtrering kan hamna här." />}
+            {view === "categories" && <SimpleCard title="Kategorier"  text="Lägg till/hantera kategorier och koppla impulsköp till dem." />}
+            {view === "settings"   && <SimpleCard title="Inställningar" text="Tema, notiser och export/import (kommer senare)." />}
+            {view === "about"      && <SimpleCard title="Om" text="Saved it – logga avståenden och spara pengar. Allt lagras lokalt." />}
+            {view === "feedback"   && <SimpleCard title="Feedback" text={`Maila gärna idéer: ${FEEDBACK_EMAIL}`} />}
 
             <Drawer current={view} onChange={setView} />
           </>
         );
-      }
-
-      function Drawer({current, onChange}){
-        useEffect(() => {
-          const drawer = document.getElementById("drawer");
-          const buttons = drawer.querySelectorAll('.nav-btn');
-          buttons.forEach(b => {
-            b.classList.toggle('active', b.dataset.view === current);
-            b.onclick = () => { onChange(b.dataset.view); drawer.classList.remove("open"); };
-          });
-        }, [current, onChange]);
-        return null;
       }
 
       const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -573,11 +552,10 @@ const GoalsView = () => {
         }
       });
 
-      // Service worker (robust registrering med BASE)
+      // Service worker (BASE-säker registrering)
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           const BASE = window.__BASE_PATH__ || '/';
-          // Registrera alltid från rätt path (t.ex. /<REPO>/service-worker.js på Pages)
           navigator.serviceWorker.register(`${BASE}service-worker.js`).catch(()=>{});
         });
       }
