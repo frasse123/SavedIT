@@ -1,6 +1,6 @@
 // service-worker.js
 const BASE = '/<REPO>/';        // <-- '/<REPO>/' på GitHub Pages, annars '/'
-const CACHE_NAME = 'savedit-v9'; // bumpa version vid varje deploy
+const CACHE_NAME = 'savedit-v10'; // bumpa version vid varje deploy
 
 // Lista det du vill förladda i cachen:
 const PRECACHE = [
@@ -79,3 +79,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
