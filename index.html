@@ -745,7 +745,7 @@ function HistoryView({ saved, onDelete, onClear }) {
   />
 )}
             {view === "settings"   && <SimpleCard title="Inställningar" text="Tema, notiser och export/import (kommer senare)." />}
-            {view === "about"      && <SimpleCard title="Om" text="Saved it – logga avståenden och spara pengar. Allt lagras lokalt." />}
+            {view === "about"      && <SimpleCard title="Om" text="Saved it – logga avståenden och spara pengar. Allt lagras lokalt. Utvecklad av IT-gurus. Kontakta oss: kontakt@it-gurus.se'" />}
             {view === "feedback"   && <SimpleCard title="Feedback" text={`Maila gärna idéer: ${FEEDBACK_EMAIL}`} />}
 
             <Drawer current={view} onChange={setView} />
@@ -784,5 +784,6 @@ function HistoryView({ saved, onDelete, onClear }) {
     </script>
   </body>
 </html>
+
 
 
