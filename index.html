@@ -735,6 +735,9 @@ function HistoryView({ saved, onDelete, onClear }) {
                 toggleLink={toggleLink}
               />
             )}
+            {view === "categories" && (
+  <SimpleCard title="Kategorier" text="Kommer snart – här kan du gruppera avståenden." />
+)}
 
            {view === "insights" && <InsightsView saved={saved} />}
 {view === "history" && (
@@ -784,6 +787,7 @@ function HistoryView({ saved, onDelete, onClear }) {
     </script>
   </body>
 </html>
+
 
 
 
