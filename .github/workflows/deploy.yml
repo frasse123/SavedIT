@@ -1,0 +1,32 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Sync files to Pi (rsync)
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: ./
+          remote_path: ${{ secrets.PI_PATH || format('/home/{0}/saved-it/site/', secrets.PI_USER) }}
+          remote_host: ${{ secrets.PI_HOST }}
+          remote_user: ${{ secrets.PI_USER }}
+          remote_key: ${{ secrets.PI_SSH_KEY }}
+
+      - name: Reload Caddy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          script: |
+            docker ps
+            docker exec $(docker ps -qf "ancestor=caddy") caddy reload --config /etc/caddy/Caddyfile || true
